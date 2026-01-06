@@ -1,0 +1,63 @@
+from django.contrib.auth import authenticate
+from rest_framework import serializers
+
+from user.models import CustomUser
+from .user import UserMinimalSerializer
+
+
+class LoginSerializer(serializers.Serializer):
+    """Serializer for user login."""
+
+    email = serializers.EmailField(
+        help_text="User's email address"
+    )
+    password = serializers.CharField(
+        write_only=True,
+        style={"input_type": "password"},
+        trim_whitespace=False,
+        help_text="User's password"
+    )
+    remember_me = serializers.BooleanField(
+        required=False,
+        default=False,
+        help_text="Keep user logged in for extended period"
+    )
+
+    def validate_email(self, value):
+        """Normalize email to lowercase."""
+        return value.lower().strip()
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        if email and password:
+            user = authenticate(
+                request=self.context.get("request"),
+                email=email,
+                password=password
+            )
+
+            if not user:
+                raise serializers.ValidationError(
+                    "Invalid email or password.",
+                    code="authentication"
+                )
+
+            if not user.is_active:
+                raise serializers.ValidationError(
+                    "This account has been deactivated.",
+                    code="authorization"
+                )
+
+            attrs["user"] = user
+
+        return attrs
+
+
+class LoginResponseSerializer(serializers.Serializer):
+    """Serializer for login response."""
+
+    token = serializers.CharField(help_text="Authentication token")
+    user = UserMinimalSerializer(help_text="User details")
+    message = serializers.CharField(help_text="Response message")
