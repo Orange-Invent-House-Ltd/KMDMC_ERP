@@ -2,12 +2,22 @@ from django.contrib.auth.password_validation import validate_password
 from django.db import transaction
 from rest_framework import serializers
 
-from user.models import CustomUser
+from user.models import CustomUser, Department
 
 
 class RegisterSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=255, help_text="User's full name")
+    username = serializers.CharField(
+        max_length=150,
+        help_text="User's username (used for login)"
+    )
     email = serializers.EmailField(help_text="User's email address")
+    department = serializers.PrimaryKeyRelatedField(
+        queryset=Department.objects.all(),
+        required=False,
+        allow_null=True,
+        help_text="User's department ID"
+    )
     phone = serializers.CharField(
         max_length=50,
         required=False,
@@ -35,10 +45,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = [
             "id",
+            "username",
             "name",
             "email",
             "phone",
             "role",
+            "department",
             "password",
             "confirm_password",
             "is_verified",
@@ -46,9 +58,17 @@ class RegisterSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "is_verified", "created_at"]
 
+    def validate_username(self, value):
+        username = value.lower().strip()
+        if CustomUser.objects.filter(username__iexact=username).exists():
+            raise serializers.ValidationError(
+                "A user with this username already exists."
+            )
+        return username
+
     def validate_email(self, value):
         email = value.lower().strip()
-        if CustomUser.objects.filter(email=email).exists():
+        if CustomUser.objects.filter(email__iexact=email).exists():
             raise serializers.ValidationError(
                 "A user with this email already exists."
             )

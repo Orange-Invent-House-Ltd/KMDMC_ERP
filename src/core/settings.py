@@ -126,6 +126,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Custom user model
 AUTH_USER_MODEL = "user.CustomUser"
 
+# Authentication backends - allows login with username or email
+AUTHENTICATION_BACKENDS = [
+    "user.backends.EmailOrUsernameBackend",
+    "django.contrib.auth.backends.ModelBackend",  # Fallback
+]
+
 # Django REST Framework settings
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [

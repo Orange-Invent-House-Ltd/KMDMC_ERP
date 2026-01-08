@@ -29,7 +29,7 @@ class RegisterView(CreateAPIView):
 
         return Response(
             success=True,
-            message="User registered successfully. Please verify your email.",
+            message="User registered successfully.",
             data=user_data,
             status_code=status.HTTP_201_CREATED,
         )

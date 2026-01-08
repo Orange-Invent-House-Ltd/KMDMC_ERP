@@ -6,10 +6,10 @@ from .user import UserMinimalSerializer
 
 
 class LoginSerializer(serializers.Serializer):
-    """Serializer for user login."""
+    """Serializer for user login. Accepts username or email."""
 
-    email = serializers.EmailField(
-        help_text="User's email address"
+    login = serializers.CharField(
+        help_text="Username or email address"
     )
     password = serializers.CharField(
         write_only=True,
@@ -23,24 +23,26 @@ class LoginSerializer(serializers.Serializer):
         help_text="Keep user logged in for extended period"
     )
 
-    def validate_email(self, value):
-        """Normalize email to lowercase."""
+    def validate_login(self, value):
+        """Normalize login to lowercase."""
         return value.lower().strip()
 
     def validate(self, attrs):
-        email = attrs.get("email")
+        login = attrs.get("login")
         password = attrs.get("password")
 
-        if email and password:
+        if login and password:
+            # authenticate() will use our custom backend
+            # which checks both username and email
             user = authenticate(
                 request=self.context.get("request"),
-                email=email,
+                username=login,  # Our backend handles both username and email
                 password=password
             )
 
             if not user:
                 raise serializers.ValidationError(
-                    "Invalid email or password.",
+                    "Invalid username/email or password.",
                     code="authentication"
                 )
 

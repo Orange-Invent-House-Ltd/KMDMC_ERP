@@ -85,7 +85,7 @@ class CustomUser(AbstractUser):
         ('remote', 'Remote'),
     ]
 
-    username = None
+    username = models.CharField(max_length=150, unique=True)
     name = models.CharField(max_length=255)
     email = models.EmailField(max_length=255, unique=True)
     phone = models.CharField(max_length=50, unique=True, null=True, blank=True)
@@ -125,7 +125,7 @@ class CustomUser(AbstractUser):
     performance_points = models.IntegerField(default=0)
     
     # Legacy fields
-    is_verified = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=True)
     is_buyer = models.BooleanField(default=False)
     is_seller = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
