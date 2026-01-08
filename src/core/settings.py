@@ -1,5 +1,6 @@
 from datetime import timedelta
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,10 +32,11 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
-    "drf_yasg",
-    # Local apps
+    "drf_yasg",    # Local apps
     "user",
     "dashboard",
+    "console",
+    "correspondence",
 ]
 
 MIDDLEWARE = [
@@ -161,3 +163,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+# Email settings
+FROM_EMAIL = os.environ.get("FROM_EMAIL", "noreply@kmdmc.com")
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"  # Use console for dev

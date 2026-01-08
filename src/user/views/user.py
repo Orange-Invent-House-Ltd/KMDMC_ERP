@@ -1,4 +1,4 @@
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -7,8 +7,17 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from user.serializers.user import UserSerializer
 
 
+class LogoutSerializer(serializers.Serializer):
+    """Serializer for logout request."""
+    refresh = serializers.CharField(
+        required=False,
+        help_text="Refresh token to blacklist"
+    )
+
+
 class LogoutView(GenericAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = LogoutSerializer
 
     def post(self, request):
         try:

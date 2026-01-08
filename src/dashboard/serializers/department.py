@@ -7,3 +7,4 @@ class DepartmentSerializer(serializers.ModelSerializer):
         model = Department
         fields = ['id', 'name', 'code', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
+        ref_name = 'DashboardDepartmentSerializer'

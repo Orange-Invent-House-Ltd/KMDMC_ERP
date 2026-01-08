@@ -8,6 +8,11 @@ from user.views.password import (
     ResetPasswordView,
 )
 from user.views.user import LogoutView, UserProfileView
+from user.views.staff_profile import (
+    StaffProfileView,
+    StaffTasksView,
+    StaffCorrespondencesView,
+)
 
 app_name = "user"
 
@@ -24,4 +29,9 @@ urlpatterns = [
     
     # Profile
     path("profile/", UserProfileView.as_view(), name="profile"),
+    
+    # Staff Profile
+    path("me/", StaffProfileView.as_view(), name="staff_profile"),
+    path("me/tasks/", StaffTasksView.as_view(), name="staff_tasks"),
+    path("me/correspondences/", StaffCorrespondencesView.as_view(), name="staff_correspondences"),
 ]

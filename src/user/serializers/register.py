@@ -15,6 +15,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         allow_null=True,
         help_text="User's phone number (optional)"
     )
+    role = serializers.ChoiceField(
+        choices=CustomUser.ROLE_CHOICES,
+        default='general_staff',
+        help_text="User's role in the organization"
+    )
     password = serializers.CharField(
         write_only=True,
         style={"input_type": "password"},
@@ -33,6 +38,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             "name",
             "email",
             "phone",
+            "role",
             "password",
             "confirm_password",
             "is_verified",

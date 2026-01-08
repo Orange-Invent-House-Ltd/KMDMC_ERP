@@ -1,14 +1,18 @@
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
-
-from user.models import CustomUser
+from utils.response import Response
 from user.serializers.password import (
     ChangePasswordSerializer,
     ForgotPasswordSerializer,
     ResetPasswordSerializer,
 )
+from user import tasks
+from utils.utils import (
+    generate_otp,
+    generate_random_text,
+)
+from core.resources.cache import Cache
 
 
 class ForgotPasswordView(GenericAPIView):
@@ -20,27 +24,40 @@ class ForgotPasswordView(GenericAPIView):
         
         if not serializer.is_valid():
             return Response(
-                {
-                    "success": False,
-                    "message": "Validation error",
-                    "errors": serializer.errors,
-                },
-                status=status.HTTP_400_BAD_REQUEST,
+                success=False,
+                message="Validation error",
+                errors=serializer.errors,
+                status_code=status.HTTP_400_BAD_REQUEST,
             )
 
         email = serializer.validated_data["email"]
+        user = serializer.validated_data["user"]
+        name = user.name
+        otp = generate_otp()
+        otp_key = generate_random_text(80)
 
-        # TODO: Generate reset token and send email
-        # For security, always return success message regardless of email existence
+        value = {
+            "otp": otp,
+            "email": email,
+            "is_valid": True,
+        }
+        with Cache() as cache:
+            cache.set(otp_key, value, 60 * 15)  # OTP/Token expires in 15 minutes
+        dynamic_values = {
+            "first_name": name.split(" ")[0],
+            "recipient": email,
+            "otp": otp,
+        }
+        # TODO: Uncomment when email task is ready
+        # tasks.send_reset_password_request_email.delay(email, dynamic_values)l
 
         return Response(
-            {
-                "success": True,
-                "message": "If an account exists with this email, you will receive a password reset link.",
-            },
-            status=status.HTTP_200_OK,
+            success=True,
+            message="If an account exists with this email, you will receive a password reset link.",
+            data={"otp_key": otp_key}, #remove this in production
+            status_code=status.HTTP_200_OK,
         )
-
+    
 
 class ResetPasswordView(GenericAPIView):
     serializer_class = ResetPasswordSerializer
@@ -51,26 +68,22 @@ class ResetPasswordView(GenericAPIView):
         
         if not serializer.is_valid():
             return Response(
-                {
-                    "success": False,
-                    "message": "Validation error",
-                    "errors": serializer.errors,
-                },
-                status=status.HTTP_400_BAD_REQUEST,
+                success=False,
+                message="Validation error",
+                errors=serializer.errors,
+                status_code=status.HTTP_400_BAD_REQUEST,
             )
 
         token = serializer.validated_data["token"]
         new_password = serializer.validated_data["new_password"]
-
-        # TODO: Validate token and get user
-        # TODO: Set new password
+        user = serializer.validated_data["user"]
+        user.set_password(new_password)
+        user.save()
 
         return Response(
-            {
-                "success": True,
-                "message": "Password has been reset successfully. Please sign in with your new password.",
-            },
-            status=status.HTTP_200_OK,
+            success=True,
+            message="Password has been reset successfully. Please sign in with your new password.",
+            status_code=status.HTTP_200_OK,
         )
 
 
@@ -83,12 +96,10 @@ class ChangePasswordView(GenericAPIView):
         
         if not serializer.is_valid():
             return Response(
-                {
-                    "success": False,
-                    "message": "Validation error",
-                    "errors": serializer.errors,
-                },
-                status=status.HTTP_400_BAD_REQUEST,
+                success=False,
+                message="Validation error",
+                errors=serializer.errors,
+                status_code=status.HTTP_400_BAD_REQUEST,
             )
 
         user = request.user
@@ -98,9 +109,6 @@ class ChangePasswordView(GenericAPIView):
         user.save()
 
         return Response(
-            {
-                "success": True,
-                "message": "Password changed successfully.",
-            },
-            status=status.HTTP_200_OK,
+            success=True,
+            message="Password changed successfully.",
         )
