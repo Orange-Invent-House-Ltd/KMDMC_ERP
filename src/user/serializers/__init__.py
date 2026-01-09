@@ -3,8 +3,6 @@ from .register import RegisterSerializer
 from .password import ForgotPasswordSerializer, ResetPasswordSerializer
 from .user import UserSerializer
 from .staff_profile import (
-    DepartmentSerializer,
-    DepartmentDropdownSerializer,
     StaffListSerializer,
     StaffProfileSerializer,
     StaffProfileUpdateSerializer,

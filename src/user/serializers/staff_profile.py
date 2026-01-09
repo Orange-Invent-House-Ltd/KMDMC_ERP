@@ -8,26 +8,15 @@ from user.models import (CustomUser, Department, StaffActivity,
 from correspondence.models import Correspondence
 
 
-class DepartmentSerializer(serializers.ModelSerializer):
-    """Serializer for Department."""
-    head_name = serializers.CharField(source='head.name', read_only=True)
-    staff_count = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Department
-        fields = ['id', 'name', 'code', 'description', 'head_name', 'staff_count', 'is_active']
-        ref_name = 'UserDepartmentSerializer'
-
-    def get_staff_count(self, obj):
-        return obj.staff_members.filter(is_active=True).count()
-
-
-class DepartmentDropdownSerializer(serializers.ModelSerializer):
-    """Lightweight department serializer for dropdowns."""
-    class Meta:
-        model = Department
-        fields = ['id', 'name', 'code']
-
+# class DepartmentSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Department
+#         fields = ['id', 'name', 'code', 'description', 'is_active']
+#         ref_name = 'UserDepartmentSerializer'
+    
+#     def create(self, validated_data):
+#         department = Department.objects.create(**validated_data)
+#         return department
 
 class StaffTaskSerializer(serializers.ModelSerializer):
     """Serializer for staff tasks."""
@@ -37,7 +26,6 @@ class StaffTaskSerializer(serializers.ModelSerializer):
             'id', 'title', 'description', 'assigned_by',
             'status', 'priority', 'due_date'
         ]
-
 
 class StaffActivitySerializer(serializers.ModelSerializer):
     """Serializer for staff activity (heatmap data)."""

@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from utils.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from django.db.models import Q, Count, Avg, Sum
@@ -11,8 +11,6 @@ from datetime import timedelta
 from utils.pagination import CustomPagination
 from user.models import CustomUser, Department, StaffActivity, PerformanceRecord, StaffTask
 from user.serializers.staff_profile import (
-    DepartmentSerializer,
-    DepartmentDropdownSerializer,
     StaffListSerializer,
     StaffProfileSerializer,
     StaffProfileUpdateSerializer,
@@ -20,28 +18,93 @@ from user.serializers.staff_profile import (
     StaffActivitySerializer,
     PerformanceRecordSerializer,
 )
+from console.serializers import DepartmentSerializer
 
 
 class DepartmentViewSet(viewsets.ModelViewSet):
     """ViewSet for managing departments."""
-    queryset = Department.objects.select_related('head', 'parent').all()
-    permission_classes = [IsAuthenticated]
+    queryset = Department.objects.all()
+    permission_classes = [AllowAny]  
     filterset_fields = ['is_active', 'parent']
     search_fields = ['name', 'code', 'description']
     ordering_fields = ['name', 'code', 'created_at']
     ordering = ['name']
+    serializer_class = DepartmentSerializer
 
-    def get_serializer_class(self):
-        if self.action == 'dropdown':
-            return DepartmentDropdownSerializer
-        return DepartmentSerializer
+    def list(self, request, *args, **kwargs):
+        """Override list to return custom response format."""
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(
+            success=True,
+            message="Departments retrieved successfully",
+            data=serializer.data,
+            status_code=status.HTTP_200_OK
+        )
 
-    @action(detail=False, methods=['get'])
-    def dropdown(self, request):
-        """Get departments for dropdown selection."""
-        departments = self.get_queryset().filter(is_active=True)
-        serializer = DepartmentDropdownSerializer(departments, many=True)
-        return Response(serializer.data)
+    def retrieve(self, request, *args, **kwargs):
+        """Override retrieve to return custom response format."""
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(
+            success=True,
+            message="Department retrieved successfully",
+            data=serializer.data,
+            status_code=status.HTTP_200_OK
+        )
+
+    def create(self, request, *args, **kwargs):
+        """Override create to return custom response format."""
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                success=False,
+                errors=serializer.errors,
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
+        return Response(
+            success=True,
+            message="Department created successfully",
+            data=serializer.data,
+            status_code=status.HTTP_201_CREATED
+        )
+
+    def update(self, request, *args, **kwargs):
+        """Override update to return custom response format."""
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        if not serializer.is_valid():
+            return Response(
+                success=False,
+                errors=serializer.errors,
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
+        return Response(
+            success=True,
+            message="Department updated successfully",
+            data=serializer.data,
+            status_code=status.HTTP_200_OK
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        """Override destroy to return custom response format."""
+        instance = self.get_object()
+        instance.delete()
+        return Response(
+            success=True,
+            message="Department deleted successfully",
+            status_code=status.HTTP_200_OK
+        )
+
 
 class StaffsProfileViewSet(viewsets.ModelViewSet):
     """
@@ -49,13 +112,13 @@ class StaffsProfileViewSet(viewsets.ModelViewSet):
     Provides detailed views for individual staff members.
     """
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     filterset_fields = ['department', 'role', 'location', 'is_active']
     search_fields = ['name', 'email', 'employee_id', 'position']
     ordering_fields = ['name', 'employee_id', 'created_at', 'department__name']
     ordering = ['name']
     pagination_class = CustomPagination
-    queryset = CustomUser.objects.filter(role = "general_staff").select_related('department', 'head').all()
+    queryset = CustomUser.objects.filter(role = "general_staff").select_related('department').all()
     
 
     def get_serializer_class(self):
@@ -96,7 +159,6 @@ class StaffsProfileViewSet(viewsets.ModelViewSet):
         if not serializer.is_valid():
             return Response(
                 success=False,
-                message="Profile update failed",
                 errors=serializer.errors,
                 status_code=status.HTTP_400_BAD_REQUEST
             )

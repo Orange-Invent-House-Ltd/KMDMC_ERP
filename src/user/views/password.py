@@ -18,6 +18,7 @@ from core.resources.cache import Cache
 class ForgotPasswordView(GenericAPIView):
     serializer_class = ForgotPasswordSerializer
     permission_classes = [AllowAny]
+    authentication_classes = []  # Disable authentication for forgot password
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -62,6 +63,7 @@ class ForgotPasswordView(GenericAPIView):
 class ResetPasswordView(GenericAPIView):
     serializer_class = ResetPasswordSerializer
     permission_classes = [AllowAny]
+    authentication_classes = []  # Disable authentication for reset password
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
