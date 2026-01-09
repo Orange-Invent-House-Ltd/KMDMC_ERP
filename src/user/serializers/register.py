@@ -14,6 +14,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(help_text="User's email address")
     department = serializers.PrimaryKeyRelatedField(
         queryset=Department.objects.all(),
+        source='code',
         required=False,
         allow_null=True,
         help_text="User's department ID"

@@ -7,11 +7,11 @@ from .models import CustomUser, Department, StaffActivity, PerformanceRecord, St
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ['name', 'code', 'head', 'parent', 'is_active', 'staff_count']
-    list_filter = ['is_active', 'parent']
+    list_display = ['name', 'code', 'head', 'is_active', 'staff_count']
+    list_filter = ['is_active']
     search_fields = ['name', 'code', 'description']
     ordering = ['name']
-    raw_id_fields = ['head', 'parent']
+    raw_id_fields = ['head']
 
     def staff_count(self, obj):
         return obj.staff_members.filter(is_active=True).count()
@@ -21,11 +21,11 @@ class DepartmentAdmin(admin.ModelAdmin):
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
-    list_display = ['email', 'name', 'employee_id', 'position', 'department', 'role', 'is_verified', 'is_active', 'created_at']
-    list_filter = ['role', 'department', 'location', 'is_verified', 'is_active', 'is_staff']
+    list_display = ['email', 'name', 'employee_id', 'position', 'role', 'is_verified', 'is_active', 'created_at']
+    list_filter = ['role', 'location', 'is_verified', 'is_active', 'is_staff']
     search_fields = ['email', 'name', 'phone', 'employee_id', 'position']
     ordering = ['-created_at']
-    raw_id_fields = ['department', 'reports_to']
+    raw_id_fields = ['reports_to']
     
     fieldsets = (
         (None, {'fields': ('email', 'password')}),

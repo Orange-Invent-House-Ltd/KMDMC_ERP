@@ -12,6 +12,7 @@ class LoginView(GenericAPIView):
 
     serializer_class = LoginSerializer
     permission_classes = [AllowAny]
+    authentication_classes = []  # Disable authentication for login endpoint
 
     def post(self, request):
         
