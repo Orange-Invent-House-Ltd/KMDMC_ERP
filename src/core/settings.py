@@ -95,7 +95,6 @@ db_port = os.getenv("POSTGRES_PORT")
 # Use PostgreSQL if all env vars are set, otherwise fallback to SQLite
 db_uri = f"postgres://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
 db_uri = os.getenv("DATABASE_URL")
-print(f"Database URL from environment: {db_uri}")
 DATABASES = {"default": dj_database_url.parse(db_uri, conn_max_age=600)}
 
 
