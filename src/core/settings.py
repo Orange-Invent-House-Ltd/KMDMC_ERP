@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "dashboard",
     "console",
     "correspondence",
+    "audit",
 ]
 
 MIDDLEWARE = [

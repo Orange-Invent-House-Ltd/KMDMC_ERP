@@ -1,13 +1,14 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.response import Response
+from utils.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from datetime import timedelta
-
+from audit.enums import AuditModuleEnum, AuditStatusEnum, AuditTypeEnum, LogParams
+from audit.tasks import log_audit_event_task
 from correspondence.models import Correspondence
 from correspondence.serializers import (
     CorrespondenceSerializer,
@@ -109,17 +110,16 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
         """Retrieve correspondence and log the view activity."""
         instance = self.get_object()
         
-        # Log view activity (only once per session or time period)
-        CorrespondenceActivity.objects.create(
-            correspondence=instance,
-            action='viewed',
-            description=f"Viewed by {request.user.name}",
-            performed_by=request.user,
-            is_automated=True
-        )
+        # TODO: Log view activity (only once per session or time period)
         
         serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        return Response(
+            success = True,
+            message = "Correspondence retrieved successfully",
+            data = serializer.data,
+            status_code = status.HTTP_200_OK,
+        )
+    
 
     # =========================================================================
     # Correspondence Type Filters
@@ -136,7 +136,24 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
             serializer = CorrespondenceListSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
         serializer = CorrespondenceListSerializer(queryset, many=True)
-        return Response(serializer.data)
+        event = LogParams(
+            audit_type=AuditTypeEnum.VIEW_CORRESPONDENCE.raw_value,
+            audit_module=AuditModuleEnum.AUDIT.raw_value,
+            status=AuditStatusEnum.SUCCESS.raw_value,
+            user_id=str(request.user.id),
+            user_name=request.user.name.upper(),
+            user_email=request.user.email,
+            user_role=request.user.role.name,
+            action=f"{request.user.name.upper()} viewed incoming correspondence",
+            request_meta=extract_api_request_metadata(request),
+        )
+        log_audit_event_task.delay(event.__dict__)
+        return Response(
+            success=True,
+            message="Incoming correspondence retrieved successfully",
+            data=serializer.data,
+            status_code =status.HTTP_200_OK
+        )
 
     @action(detail=False, methods=['get'])
     def outgoing(self, request):
@@ -149,7 +166,25 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
             serializer = CorrespondenceListSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
         serializer = CorrespondenceListSerializer(queryset, many=True)
-        return Response(serializer.data)
+        event = LogParams(
+            audit_type=AuditTypeEnum.VIEW_CORRESPONDENCE.raw_value,
+            audit_module=AuditModuleEnum.AUDIT.raw_value,
+            status=AuditStatusEnum.SUCCESS.raw_value,
+            user_id=str(request.user.id),
+            user_name=request.user.name.upper(),
+            user_email=request.user.email,
+            user_role=request.user.role.name,
+            action=f"{request.user.name.upper()} viewed outgoing correspondence",
+            request_meta=extract_api_request_metadata(request),
+        )
+        log_audit_event_task.delay(event.__dict__)
+        
+        return Response(
+            success=True,
+            message="Outgoing correspondence retrieved successfully",
+            data=serializer.data,
+            status_code=status.HTTP_200_OK
+        )
 
     # =========================================================================
     # Status Management
@@ -169,26 +204,25 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
             correspondence.status = new_status
             correspondence.save()
             
-            # Log activity
-            description = f"Status changed from {old_status} to {new_status}"
-            if notes:
-                description += f". Notes: {notes}"
-            
-            CorrespondenceActivity.objects.create(
-                correspondence=correspondence,
-                action='status_changed',
-                description=description,
-                performed_by=request.user,
-                metadata={
-                    'old_status': old_status,
-                    'new_status': new_status,
-                    'notes': notes
-                }
-            )
-            
-            return Response(CorrespondenceSerializer(correspondence).data)
+            event = LogParams(
+            audit_type=AuditTypeEnum.CHANGE_CORRESPONDENCE_STATUS.raw_value,
+            audit_module=AuditModuleEnum.AUDIT.raw_value,
+            status=AuditStatusEnum.SUCCESS.raw_value,
+            user_id=str(request.user.id),
+            user_name=request.user.name.upper(),
+            user_email=request.user.email,
+            user_role=request.user.role.name,
+            action=f"{request.user.name.upper()} changed correspondence status from {old_status} to {new_status}",
+            request_meta=extract_api_request_metadata(request),
+        )
+        log_audit_event_task.delay(event.__dict__)
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            success=True,
+            message = "Correspondence status updated successfully",
+            data=serializer.data,
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
 
     @action(detail=True, methods=['post'])
     def archive(self, request, pk=None):
@@ -198,15 +232,25 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
         correspondence.status = 'archived'
         correspondence.save()
         
-        CorrespondenceActivity.objects.create(
-            correspondence=correspondence,
-            action='archived',
-            description=f"Archived by {request.user.name}",
-            performed_by=request.user,
-            metadata={'old_status': old_status}
+        event = LogParams(
+            audit_type=AuditTypeEnum.ARCHIVE_CORRESPONDENCE.raw_value,
+            audit_module=AuditModuleEnum.AUDIT.raw_value,
+            status=AuditStatusEnum.SUCCESS.raw_value,
+            user_id=str(request.user.id),
+            user_name=request.user.name.upper(),
+            user_email=request.user.email,
+            user_role=request.user.role.name,
+            action=f"{request.user.name.upper()} archived correspondence",
+            request_meta=extract_api_request_metadata(request),
         )
+        log_audit_event_task.delay(event.__dict__)
         
-        return Response(CorrespondenceSerializer(correspondence).data)
+        return Response(
+            success=True,
+            message="Correspondence archived successfully",
+            data=CorrespondenceSerializer(correspondence).data,
+            status_code=status.HTTP_200_OK,
+        )
 
     @action(detail=True, methods=['post'])
     def close(self, request, pk=None):
