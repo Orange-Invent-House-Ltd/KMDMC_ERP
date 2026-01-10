@@ -172,13 +172,15 @@ class StaffsProfileViewSet(viewsets.ModelViewSet):
             message='Profile updated successfully',
             data=profile_serializer.data
         )
+    
+
 class StaffTaskViewSet(viewsets.ModelViewSet):
     """ViewSet for managing staff tasks."""
     queryset = StaffTask.objects.select_related(
         'assigned_to', 'assigned_by', 'department'
     ).all()
     serializer_class = StaffTaskSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     filterset_fields = ['assigned_to', 'assigned_by', 'status', 'priority', 'department']
     search_fields = ['title', 'description']
     ordering_fields = ['created_at', 'due_date', 'priority']
@@ -197,8 +199,79 @@ class StaffTaskViewSet(viewsets.ModelViewSet):
         
         return queryset
 
-    def perform_create(self, serializer):
-        serializer.save(assigned_by=self.request.user)
+    def list(self, request, *args, **kwargs):
+        """List all tasks with custom response format."""
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(
+            success=True,
+            message="Tasks retrieved successfully",
+            data=serializer.data,
+            status_code=status.HTTP_200_OK
+        )
+
+    def retrieve(self, request, *args, **kwargs):
+        """Retrieve a single task with custom response format."""
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(
+            success=True,
+            message="Task retrieved successfully",
+            data=serializer.data,
+            status_code=status.HTTP_200_OK
+        )
+
+    def create(self, request, *args, **kwargs):
+        """Create a new task with custom response format."""
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                success=False,
+                errors=serializer.errors,
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.save(assigned_by=request.user)
+        return Response(
+            success=True,
+            message="Task created successfully",
+            data=serializer.data,
+            status_code=status.HTTP_201_CREATED
+        )
+
+    def update(self, request, *args, **kwargs):
+        """Update a task with custom response format."""
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        if not serializer.is_valid():
+            return Response(
+                success=False,
+                errors=serializer.errors,
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
+        return Response(
+            success=True,
+            message="Task updated successfully",
+            data=serializer.data,
+            status_code=status.HTTP_200_OK
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        """Delete a task with custom response format."""
+        instance = self.get_object()
+        instance.delete()
+        return Response(
+            success=True,
+            message="Task deleted successfully",
+            status_code=status.HTTP_200_OK
+        )
 
     @action(detail=True, methods=['post'])
     def complete(self, request, pk=None):
@@ -211,10 +284,13 @@ class StaffTaskViewSet(viewsets.ModelViewSet):
         # Update user activity
         self._record_activity(task.assigned_to, 'task_completed')
         
-        return Response({
-            'success': True,
-            'message': 'Task marked as completed'
-        })
+        serializer = self.get_serializer(task)
+        return Response(
+            success=True,
+            message="Task marked as completed",
+            data=serializer.data,
+            status_code=status.HTTP_200_OK
+        )
 
     @action(detail=True, methods=['post'])
     def start(self, request, pk=None):
@@ -223,10 +299,13 @@ class StaffTaskViewSet(viewsets.ModelViewSet):
         task.status = 'in_progress'
         task.save()
         
-        return Response({
-            'success': True,
-            'message': 'Task started'
-        })
+        serializer = self.get_serializer(task)
+        return Response(
+            success=True,
+            message="Task started",
+            data=serializer.data,
+            status_code=status.HTTP_200_OK
+        )
 
     def _record_activity(self, user, activity_type):
         """Record activity for heatmap."""
