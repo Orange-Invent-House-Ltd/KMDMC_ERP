@@ -3,10 +3,13 @@ from pathlib import Path
 import os
 import dj_database_url
 from dotenv import load_dotenv
-load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load .env file from project root (one level up from src/)
+env_path = BASE_DIR.parent / '.env'
+load_dotenv(env_path)
 
 
 # Quick-start development settings - unsuitable for production
@@ -90,17 +93,8 @@ db_user = os.getenv("POSTGRES_USER")
 db_port = os.getenv("POSTGRES_PORT")
 
 # Use PostgreSQL if all env vars are set, otherwise fallback to SQLite
-if all([db_name, db_user, db_password, db_host, db_port]):
-    db_uri = f"postgres://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
-    DATABASES = {"default": dj_database_url.parse(db_uri, conn_max_age=600)}
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
-
+db_uri = f"postgres://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+DATABASES = {"default": dj_database_url.parse(db_uri, conn_max_age=600)}
 
 
 # Password validation
