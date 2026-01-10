@@ -7,3 +7,4 @@ drf_yasg==1.21.8
 python-dotenv==1.2.1
 redis==5.1.1
 rest_framework_simplejwt==0.0.2
+django-cors-headers==3.13.0
