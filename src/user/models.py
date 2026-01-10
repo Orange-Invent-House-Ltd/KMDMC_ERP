@@ -97,7 +97,7 @@ class CustomUser(AbstractUser):
     )
     location = models.CharField(max_length=20, choices=LOCATION_CHOICES, default='headquarters')
     date_joined_org = models.DateField(null=True, blank=True, help_text="Date joined organization")
-    profile_photo = models.ImageField(upload_to='profiles/%Y/%m/', null=True, blank=True)
+    profile_photo = models.URLField(blank=True, null=True)
     bio = models.TextField(blank=True, null=True, help_text="Short bio/description")
     
     # Contact Info
