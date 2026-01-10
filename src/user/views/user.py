@@ -1,18 +1,12 @@
 from rest_framework import serializers, status
-from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.shortcuts import get_object_or_404
+from utils.response import Response 
 
-from user.serializers.user import UserSerializer
-
-
-class LogoutSerializer(serializers.Serializer):
-    """Serializer for logout request."""
-    refresh = serializers.CharField(
-        required=False,
-        help_text="Refresh token to blacklist"
-    )
+from user.models import CustomUser
+from user.serializers.user import UserUpdateSerializer, LogoutSerializer
 
 
 class LogoutView(GenericAPIView):
@@ -43,47 +37,37 @@ class LogoutView(GenericAPIView):
             )
 
 
-class UserProfileView(RetrieveUpdateAPIView):
-    serializer_class = UserSerializer
+
+class UserUpdateView(UpdateAPIView):
+    """
+    Admin endpoint to update any user by ID.
+    
+    PUT/PATCH /v1/auth/users/<user_id>/
+    """
+    queryset = CustomUser.objects.all()
+    serializer_class = UserUpdateSerializer
     permission_classes = [AllowAny]
-
-    def get_object(self):
-        return self.request.user
-
-    def retrieve(self, request, *args, **kwargs):
-        user = self.get_object()
-        serializer = self.get_serializer(user)
-
-        return Response(
-            {
-                "success": True,
-                "message": "Profile retrieved successfully.",
-                "data": serializer.data,
-            },
-            status=status.HTTP_200_OK,
-        )
+    lookup_field = 'pk'
+    lookup_url_kwarg = 'user_id'
 
     def update(self, request, *args, **kwargs):
-        user = self.get_object()
-        serializer = self.get_serializer(user, data=request.data, partial=True)
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
         
         if not serializer.is_valid():
             return Response(
-                {
-                    "success": False,
-                    "message": "Validation error",
-                    "errors": serializer.errors,
-                },
-                status=status.HTTP_400_BAD_REQUEST,
+                success = False,
+                message = "Validation error",
+                errors = serializer.errors,
+                status_code = status.HTTP_400_BAD_REQUEST,
             )
 
         serializer.save()
 
         return Response(
-            {
-                "success": True,
-                "message": "Profile updated successfully.",
-                "data": serializer.data,
-            },
-            status=status.HTTP_200_OK,
+            success = True,
+            message = "User updated successfully",
+            data = serializer.data,
+            status_code = status.HTTP_200_OK,
         )

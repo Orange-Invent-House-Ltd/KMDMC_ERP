@@ -7,7 +7,7 @@ from .models import CustomUser, Department, StaffActivity, PerformanceRecord, St
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ['name', 'code', 'head', 'is_active', 'staff_count']
+    list_display = ['name', 'head', 'is_active', 'staff_count']
     list_filter = ['is_active']
     search_fields = ['name', 'code', 'description']
     ordering = ['name']
@@ -25,7 +25,6 @@ class CustomUserAdmin(UserAdmin):
     list_filter = ['role', 'location', 'is_verified', 'is_active', 'is_staff']
     search_fields = ['email', 'name', 'phone', 'employee_id', 'position']
     ordering = ['-created_at']
-    raw_id_fields = ['reports_to']
     
     fieldsets = (
         (None, {'fields': ('email', 'password')}),

@@ -34,8 +34,7 @@ class Manager(BaseUserManager):
 
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault("is_superuser", True)
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_active", True)
+        extra_fields.setdefault("is_active", False)
 
         return self._create_user(email, password, **extra_fields)
 
@@ -43,7 +42,6 @@ class Manager(BaseUserManager):
 class Department(models.Model):
     """Department/Unit for staff organization."""
     name = models.CharField(max_length=255)
-    code = models.CharField(max_length=20, unique=True)
     description = models.TextField(blank=True, null=True)
     head = models.ForeignKey(
         'CustomUser',
@@ -99,37 +97,11 @@ class CustomUser(AbstractUser):
     date_joined_org = models.DateField(null=True, blank=True, help_text="Date joined organization")
     profile_photo = models.URLField(blank=True, null=True)
     bio = models.TextField(blank=True, null=True, help_text="Short bio/description")
-    
-    # Contact Info
     office_phone = models.CharField(max_length=50, blank=True, null=True)
-    office_extension = models.CharField(max_length=10, blank=True, null=True)
-    
-    # Reporting Structure
-    reports_to = models.ForeignKey(
-        'self',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='direct_reports'
-    )
-    
-    # Performance fields
     performance_score = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     performance_points = models.IntegerField(default=0)
-    
-    # Legacy fields
-    is_verified = models.BooleanField(default=True)
-    is_buyer = models.BooleanField(default=False)
-    is_seller = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
-    is_merchant = models.BooleanField(default=False)
-    admin_invite_accepted = models.BooleanField(default=False)
-    admin_invite_sent = models.BooleanField(default=False)
-    ibank_onboarded = models.BooleanField(default=False)
-    kyc_completed = models.BooleanField(default=False)
-    send_email_notifications = models.BooleanField(default=True)
-    send_app_notifications = models.BooleanField(default=True)
-    send_sms_notifications = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -160,7 +132,8 @@ class CustomUser(AbstractUser):
 
     @property
     def is_general_staff(self):
-        return self.role == 'general_staff'    @property
+        return self.role == 'general_staff'
+
     def role_display(self):
         return dict(self.ROLE_CHOICES).get(self.role, 'Unknown')
 

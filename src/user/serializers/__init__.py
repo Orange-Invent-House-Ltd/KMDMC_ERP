@@ -1,7 +1,6 @@
 from .login import LoginSerializer, LoginResponseSerializer
 from .register import RegisterSerializer
 from .password import ForgotPasswordSerializer, ResetPasswordSerializer
-from .user import UserSerializer
 from .staff_profile import (
     StaffListSerializer,
     StaffProfileSerializer,
@@ -17,7 +16,6 @@ __all__ = [
     "RegisterSerializer",
     "ForgotPasswordSerializer",
     "ResetPasswordSerializer",
-    "UserSerializer",
     # Staff Profile
     "DepartmentSerializer",
     "DepartmentDropdownSerializer",
