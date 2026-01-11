@@ -55,6 +55,8 @@ class TaskCreateSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request and request.user == value:
             raise serializers.ValidationError("You cannot assign a task to yourself.")
+        if not value.is_active:
+            raise serializers.ValidationError("Assigned user is not active.")
         return value
 
 
