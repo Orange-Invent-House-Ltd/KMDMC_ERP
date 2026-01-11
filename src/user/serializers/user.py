@@ -7,11 +7,7 @@ class UserMinimalSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = [
-            "id",
-            "name",
-            "email",
-            "is_verified",
-            "is_admin",
+            "name"
         ]
         read_only_fields = fields
 

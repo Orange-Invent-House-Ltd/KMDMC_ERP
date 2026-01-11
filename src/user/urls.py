@@ -10,7 +10,6 @@ from user.views.password import (
 from user.views.user import LogoutView
 from user.views.staff_profile import (
     StaffProfileView,
-    StaffCorrespondencesView,
 )
 
 app_name = "user"
@@ -30,5 +29,4 @@ urlpatterns = [
     
     # Staff Profile
     path("staff/profile/", StaffProfileView.as_view(), name="staff_profile"),
-    path("staff/correspondences/", StaffCorrespondencesView.as_view(), name="staff_correspondences"),
 ]

@@ -25,6 +25,8 @@ class Correspondence(models.Model):
         ('high', 'High'),
         ('urgent', 'Urgent'),
     ]
+    sender = models.CharField(max_length=255)
+    reference_number = models.CharField(max_length=100, unique=True)
     subject = models.CharField(max_length=255)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='normal')

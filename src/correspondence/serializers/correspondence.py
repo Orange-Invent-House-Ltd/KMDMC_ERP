@@ -30,7 +30,6 @@ class CorrespondenceSerializer(serializers.ModelSerializer):
     assigned_to = CorrespondenceUserSerializer(read_only=True)
     assigned_by = CorrespondenceUserSerializer(read_only=True)
     logged_by = CorrespondenceUserSerializer(read_only=True)
-    
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     priority_display = serializers.CharField(source='get_priority_display', read_only=True)
 
