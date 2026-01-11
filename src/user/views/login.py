@@ -12,7 +12,7 @@ class LoginView(GenericAPIView):
 
     serializer_class = LoginSerializer
     permission_classes = [AllowAny]
-    authentication_classes = []  # Disable authentication for login endpoint
+    authentication_classes = []
 
     def post(self, request):
         
@@ -41,7 +41,7 @@ class LoginView(GenericAPIView):
             message=f"Welcome back, {user.name}!",
             data={
                 "token": str(refresh.access_token),
-                "refresh": str(refresh),
+                # "refresh": str(refresh),
                 "user": user_data,
             },
             status_code=status.HTTP_200_OK,

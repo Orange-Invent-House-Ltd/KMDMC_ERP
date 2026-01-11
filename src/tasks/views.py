@@ -159,33 +159,3 @@ class TaskViewSet(viewsets.ModelViewSet):
             message="Task deleted successfully",
             status_code=status.HTTP_200_OK
         )
-
-    @action(detail=True, methods=['post'])
-    def complete(self, request, pk=None):
-        """Mark a task as completed."""
-        task = self.get_object()
-        task.status = 'completed'
-        task.save(update_fields=['status', 'updated_at'])
-        
-        serializer = TaskSerializer(task)
-        return Response(
-            success=True,
-            message="Task marked as completed",
-            data=serializer.data,
-            status_code=status.HTTP_200_OK
-        )
-
-    @action(detail=True, methods=['post'])
-    def start(self, request, pk=None):
-        """Start working on a task (set status to in_progress)."""
-        task = self.get_object()
-        task.status = 'in_progress'
-        task.save(update_fields=['status', 'updated_at'])
-        
-        serializer = TaskSerializer(task)
-        return Response(
-            success=True,
-            message="Task started",
-            data=serializer.data,
-            status_code=status.HTTP_200_OK
-        )
