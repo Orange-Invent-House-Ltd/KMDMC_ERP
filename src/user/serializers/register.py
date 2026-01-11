@@ -105,5 +105,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         user = CustomUser(**validated_data)
         user.set_password(password)
         user.save()
-
+        user.employee_id = f"KMD-{user.id}"
+        user.save(update_fields=["employee_id"])
         return user

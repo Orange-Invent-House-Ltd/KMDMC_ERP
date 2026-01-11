@@ -84,3 +84,24 @@ class TaskAdminUpdateSerializer(serializers.ModelSerializer):
             'deadline',
         ]
         read_only_fields = ['id']
+
+
+class TaskSummarySerializer(serializers.Serializer):
+    total_tasks = serializers.SerializerMethodField()
+    pending_tasks = serializers.SerializerMethodField()
+    completed_tasks = serializers.SerializerMethodField()
+    completion_rate = serializers.SerializerMethodField()
+
+    def get_total_tasks(self, obj):
+        return obj.count() if hasattr(obj, 'count') else len(obj)
+
+    def get_pending_tasks(self, obj):
+        return obj.filter(status='pending').count()
+
+    def get_completed_tasks(self, obj):
+        return obj.filter(status='completed').count()
+
+    def get_completion_rate(self, obj):
+        total = self.get_total_tasks(obj)
+        completed = self.get_completed_tasks(obj)
+        return round((completed / total) * 100, 2) if total else 0.0

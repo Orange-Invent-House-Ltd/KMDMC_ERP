@@ -10,7 +10,7 @@ from user.serializers.user import UserMinimalSerializer
 class RegisterView(CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
-    authentication_classes = []  # Disable authentication for registration
+    authentication_classes = []
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)

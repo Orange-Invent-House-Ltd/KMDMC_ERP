@@ -6,17 +6,8 @@ from datetime import timedelta
 from user.models import (CustomUser, Department, StaffActivity,
                          PerformanceRecord)
 from correspondence.models import Correspondence
+from tasks.serializers import TaskSummarySerializer 
 
-
-# class DepartmentSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Department
-#         fields = ['id', 'name', 'code', 'description', 'is_active']
-#         ref_name = 'UserDepartmentSerializer'
-    
-#     def create(self, validated_data):
-#         department = Department.objects.create(**validated_data)
-#         return department
 
 class StaffActivitySerializer(serializers.ModelSerializer):
     """Serializer for staff activity (heatmap data)."""
@@ -84,19 +75,28 @@ class StaffListSerializer(serializers.ModelSerializer):
         return None
 
 class StaffProfileSerializer(serializers.ModelSerializer):
-    """Serializer for basic staff profile details."""
-    department_name = serializers.CharField(source='department.name', read_only=True)
+    department = serializers.StringRelatedField()
+    activity = StaffActivitySerializer(many=True, source='staffactivity_set', read_only=True)
+    performance = PerformanceRecordSerializer(many=True, source='performancerecord_set', read_only=True)
+    correspondence = StaffCorrespondenceSerializer(many=True, source='correspondence_set', read_only=True)
+    task_summary = serializers.SerializerMethodField()
+    date_joined = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
         fields = [
-            "name",
-            "position",
-            "department_name",
-            "employee_id",
-            "location",
-            "date_joined_org",
+            'id', 'email', 'department', 'position', 'date_joined', "employee_id",
+            'is_active', 'is_staff', 'activity', 'performance', 'correspondence', 'task_summary'
         ]
+
+    def get_task_summary(self, obj):
+        from tasks.models import Task
+        tasks = Task.objects.filter(assigned_to=obj)
+        serializer = TaskSummarySerializer(tasks, context=self.context)
+        return serializer.data
+
+    def get_date_joined(self, obj):
+        return obj.date_joined.strftime('%B %d, %Y')
 
 
 class StaffProfileUpdateSerializer(serializers.ModelSerializer):
