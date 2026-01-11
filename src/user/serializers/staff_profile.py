@@ -4,7 +4,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 from user.models import (CustomUser, Department, StaffActivity,
-                         PerformanceRecord, StaffTask)
+                         PerformanceRecord)
 from correspondence.models import Correspondence
 
 
@@ -17,15 +17,6 @@ from correspondence.models import Correspondence
 #     def create(self, validated_data):
 #         department = Department.objects.create(**validated_data)
 #         return department
-
-class StaffTaskSerializer(serializers.ModelSerializer):
-    """Serializer for staff tasks."""
-    class Meta:
-        model = StaffTask
-        fields = [
-            'id', 'title', 'description', 'assigned_by',
-            'status', 'priority', 'due_date'
-        ]
 
 class StaffActivitySerializer(serializers.ModelSerializer):
     """Serializer for staff activity (heatmap data)."""

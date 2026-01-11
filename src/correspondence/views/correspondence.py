@@ -136,18 +136,18 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
             serializer = CorrespondenceListSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
         serializer = CorrespondenceListSerializer(queryset, many=True)
-        event = LogParams(
-            audit_type=AuditTypeEnum.VIEW_CORRESPONDENCE.raw_value,
-            audit_module=AuditModuleEnum.AUDIT.raw_value,
-            status=AuditStatusEnum.SUCCESS.raw_value,
-            user_id=str(request.user.id),
-            user_name=request.user.name.upper(),
-            user_email=request.user.email,
-            user_role=request.user.role.name,
-            action=f"{request.user.name.upper()} viewed incoming correspondence",
-            request_meta=extract_api_request_metadata(request),
-        )
-        log_audit_event_task.delay(event.__dict__)
+        # event = LogParams(
+        #     audit_type=AuditTypeEnum.VIEW_CORRESPONDENCE.raw_value,
+        #     audit_module=AuditModuleEnum.AUDIT.raw_value,
+        #     status=AuditStatusEnum.SUCCESS.raw_value,
+        #     user_id=str(request.user.id),
+        #     user_name=request.user.name.upper(),
+        #     user_email=request.user.email,
+        #     user_role=request.user.role.name,
+        #     action=f"{request.user.name.upper()} viewed incoming correspondence",
+        #     request_meta=extract_api_request_metadata(request),
+        # )
+        # log_audit_event_task.delay(event.__dict__)
         return Response(
             success=True,
             message="Incoming correspondence retrieved successfully",
@@ -166,18 +166,18 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
             serializer = CorrespondenceListSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
         serializer = CorrespondenceListSerializer(queryset, many=True)
-        event = LogParams(
-            audit_type=AuditTypeEnum.VIEW_CORRESPONDENCE.raw_value,
-            audit_module=AuditModuleEnum.AUDIT.raw_value,
-            status=AuditStatusEnum.SUCCESS.raw_value,
-            user_id=str(request.user.id),
-            user_name=request.user.name.upper(),
-            user_email=request.user.email,
-            user_role=request.user.role.name,
-            action=f"{request.user.name.upper()} viewed outgoing correspondence",
-            request_meta=extract_api_request_metadata(request),
-        )
-        log_audit_event_task.delay(event.__dict__)
+        # event = LogParams(
+        #     audit_type=AuditTypeEnum.VIEW_CORRESPONDENCE.raw_value,
+        #     audit_module=AuditModuleEnum.AUDIT.raw_value,
+        #     status=AuditStatusEnum.SUCCESS.raw_value,
+        #     user_id=str(request.user.id),
+        #     user_name=request.user.name.upper(),
+        #     user_email=request.user.email,
+        #     user_role=request.user.role.name,
+        #     action=f"{request.user.name.upper()} viewed outgoing correspondence",
+        #     request_meta=extract_api_request_metadata(request),
+        # )
+        # log_audit_event_task.delay(event.__dict__)
         
         return Response(
             success=True,
@@ -204,18 +204,18 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
             correspondence.status = new_status
             correspondence.save()
             
-            event = LogParams(
-            audit_type=AuditTypeEnum.CHANGE_CORRESPONDENCE_STATUS.raw_value,
-            audit_module=AuditModuleEnum.AUDIT.raw_value,
-            status=AuditStatusEnum.SUCCESS.raw_value,
-            user_id=str(request.user.id),
-            user_name=request.user.name.upper(),
-            user_email=request.user.email,
-            user_role=request.user.role.name,
-            action=f"{request.user.name.upper()} changed correspondence status from {old_status} to {new_status}",
-            request_meta=extract_api_request_metadata(request),
-        )
-        log_audit_event_task.delay(event.__dict__)
+        #     event = LogParams(
+        #     audit_type=AuditTypeEnum.CHANGE_CORRESPONDENCE_STATUS.raw_value,
+        #     audit_module=AuditModuleEnum.AUDIT.raw_value,
+        #     status=AuditStatusEnum.SUCCESS.raw_value,
+        #     user_id=str(request.user.id),
+        #     user_name=request.user.name.upper(),
+        #     user_email=request.user.email,
+        #     user_role=request.user.role.name,
+        #     action=f"{request.user.name.upper()} changed correspondence status from {old_status} to {new_status}",
+        #     request_meta=extract_api_request_metadata(request),
+        # )
+        # log_audit_event_task.delay(event.__dict__)
         
         return Response(
             success=True,
@@ -232,18 +232,18 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
         correspondence.status = 'archived'
         correspondence.save()
         
-        event = LogParams(
-            audit_type=AuditTypeEnum.ARCHIVE_CORRESPONDENCE.raw_value,
-            audit_module=AuditModuleEnum.AUDIT.raw_value,
-            status=AuditStatusEnum.SUCCESS.raw_value,
-            user_id=str(request.user.id),
-            user_name=request.user.name.upper(),
-            user_email=request.user.email,
-            user_role=request.user.role.name,
-            action=f"{request.user.name.upper()} archived correspondence",
-            request_meta=extract_api_request_metadata(request),
-        )
-        log_audit_event_task.delay(event.__dict__)
+        # event = LogParams(
+        #     audit_type=AuditTypeEnum.ARCHIVE_CORRESPONDENCE.raw_value,
+        #     audit_module=AuditModuleEnum.AUDIT.raw_value,
+        #     status=AuditStatusEnum.SUCCESS.raw_value,
+        #     user_id=str(request.user.id),
+        #     user_name=request.user.name.upper(),
+        #     user_email=request.user.email,
+        #     user_role=request.user.role.name,
+        #     action=f"{request.user.name.upper()} archived correspondence",
+        #     request_meta=extract_api_request_metadata(request),
+        # )
+        # log_audit_event_task.delay(event.__dict__)
         
         return Response(
             success=True,
