@@ -103,7 +103,10 @@ class DepartmentViewSet(viewsets.ModelViewSet):
         )
 
 
-class StaffsProfileViewSet(viewsets.ModelViewSet):
+class StaffsProfileViewSet(mixins.ListModelMixin,
+                           mixins.RetrieveModelMixin,
+                           mixins.UpdateModelMixin,
+                           viewsets.GenericViewSet):
     """
     ViewSet for Staff Profile.
     Provides detailed views for individual staff members.
