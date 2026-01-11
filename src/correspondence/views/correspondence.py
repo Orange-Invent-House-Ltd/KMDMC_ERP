@@ -17,7 +17,7 @@ from correspondence.serializers import (
     CorrespondenceUpdateSerializer,
     CorrespondenceAssignSerializer,
     CorrespondenceStatusSerializer,
-    CorrespondenceStatsSerializer,
+
 )
 
 User = get_user_model()
@@ -26,9 +26,6 @@ User = get_user_model()
 class CorrespondenceViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing correspondence (incoming and outgoing mail).
-    
-    Provides comprehensive CRUD operations, filtering, assignment,
-    status management, and statistics for correspondence items.
     """
     queryset = Correspondence.objects.select_related(
         'category', 'classification',
@@ -122,71 +119,6 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
     
 
     # =========================================================================
-    # Correspondence Type Filters
-    # =========================================================================
-
-    @action(detail=False, methods=['get'])
-    def incoming(self, request):
-        """Get all incoming correspondence."""
-        queryset = self.filter_queryset(
-            self.get_queryset().filter(correspondence_type='incoming')
-        )
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = CorrespondenceListSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = CorrespondenceListSerializer(queryset, many=True)
-        # event = LogParams(
-        #     audit_type=AuditTypeEnum.VIEW_CORRESPONDENCE.raw_value,
-        #     audit_module=AuditModuleEnum.AUDIT.raw_value,
-        #     status=AuditStatusEnum.SUCCESS.raw_value,
-        #     user_id=str(request.user.id),
-        #     user_name=request.user.name.upper(),
-        #     user_email=request.user.email,
-        #     user_role=request.user.role.name,
-        #     action=f"{request.user.name.upper()} viewed incoming correspondence",
-        #     request_meta=extract_api_request_metadata(request),
-        # )
-        # log_audit_event_task.delay(event.__dict__)
-        return Response(
-            success=True,
-            message="Incoming correspondence retrieved successfully",
-            data=serializer.data,
-            status_code =status.HTTP_200_OK
-        )
-
-    @action(detail=False, methods=['get'])
-    def outgoing(self, request):
-        """Get all outgoing correspondence."""
-        queryset = self.filter_queryset(
-            self.get_queryset().filter(correspondence_type='outgoing')
-        )
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = CorrespondenceListSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = CorrespondenceListSerializer(queryset, many=True)
-        # event = LogParams(
-        #     audit_type=AuditTypeEnum.VIEW_CORRESPONDENCE.raw_value,
-        #     audit_module=AuditModuleEnum.AUDIT.raw_value,
-        #     status=AuditStatusEnum.SUCCESS.raw_value,
-        #     user_id=str(request.user.id),
-        #     user_name=request.user.name.upper(),
-        #     user_email=request.user.email,
-        #     user_role=request.user.role.name,
-        #     action=f"{request.user.name.upper()} viewed outgoing correspondence",
-        #     request_meta=extract_api_request_metadata(request),
-        # )
-        # log_audit_event_task.delay(event.__dict__)
-        
-        return Response(
-            success=True,
-            message="Outgoing correspondence retrieved successfully",
-            data=serializer.data,
-            status_code=status.HTTP_200_OK
-        )
-
-    # =========================================================================
     # Status Management
     # =========================================================================
 
@@ -224,56 +156,7 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_400_BAD_REQUEST
         )
 
-    @action(detail=True, methods=['post'])
-    def archive(self, request, pk=None):
-        """Archive a correspondence item."""
-        correspondence = self.get_object()
-        old_status = correspondence.status
-        correspondence.status = 'archived'
-        correspondence.save()
-        
-        # event = LogParams(
-        #     audit_type=AuditTypeEnum.ARCHIVE_CORRESPONDENCE.raw_value,
-        #     audit_module=AuditModuleEnum.AUDIT.raw_value,
-        #     status=AuditStatusEnum.SUCCESS.raw_value,
-        #     user_id=str(request.user.id),
-        #     user_name=request.user.name.upper(),
-        #     user_email=request.user.email,
-        #     user_role=request.user.role.name,
-        #     action=f"{request.user.name.upper()} archived correspondence",
-        #     request_meta=extract_api_request_metadata(request),
-        # )
-        # log_audit_event_task.delay(event.__dict__)
-        
-        return Response(
-            success=True,
-            message="Correspondence archived successfully",
-            data=CorrespondenceSerializer(correspondence).data,
-            status_code=status.HTTP_200_OK,
-        )
-
-    @action(detail=True, methods=['post'])
-    def close(self, request, pk=None):
-        """Close a correspondence item."""
-        correspondence = self.get_object()
-        old_status = correspondence.status
-        correspondence.status = 'closed'
-        correspondence.save()
-        
-        CorrespondenceActivity.objects.create(
-            correspondence=correspondence,
-            action='status_changed',
-            description=f"Closed by {request.user.name}",
-            performed_by=request.user,
-            metadata={'old_status': old_status, 'new_status': 'closed'}
-        )
-        
-        return Response(CorrespondenceSerializer(correspondence).data)
-
-    # =========================================================================
-    # Assignment Management
-    # =========================================================================
-
+ 
     @action(detail=True, methods=['post'])
     def assign(self, request, pk=None):
         """Assign correspondence to a user."""
@@ -320,33 +203,7 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['post'])
-    def unassign(self, request, pk=None):
-        """Remove assignment from correspondence."""
-        correspondence = self.get_object()
-        old_assigned = correspondence.assigned_to
-        
-        if not old_assigned:
-            return Response(
-                {'error': 'Correspondence is not assigned to anyone'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        correspondence.assigned_to = None
-        correspondence.assigned_by = None
-        correspondence.assigned_at = None
-        correspondence.save()
-        
-        CorrespondenceActivity.objects.create(
-            correspondence=correspondence,
-            action='assigned',
-            description=f"Unassigned from {old_assigned.name}",
-            performed_by=request.user,
-            metadata={'old_assigned_id': old_assigned.id}
-        )
-        
-        return Response(CorrespondenceSerializer(correspondence).data)
-
+   
     @action(detail=False, methods=['get'])
     def my_assignments(self, request):
         """Get correspondence assigned to the current user."""
@@ -358,73 +215,8 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
         serializer = CorrespondenceListSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'])
-    def unassigned(self, request):
-        """Get unassigned correspondence."""
-        queryset = self.get_queryset().filter(assigned_to__isnull=True)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = CorrespondenceListSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = CorrespondenceListSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-    # =========================================================================
-    # Priority & Action Filters
-    # =========================================================================
-
-    @action(detail=False, methods=['get'])
-    def urgent(self, request):
-        """Get urgent correspondence."""
-        queryset = self.get_queryset().filter(priority='urgent')
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = CorrespondenceListSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = CorrespondenceListSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=['get'])
-    def pending_action(self, request):
-        """Get correspondence pending MD action."""
-        queryset = self.get_queryset().filter(status='pending_action')
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = CorrespondenceListSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = CorrespondenceListSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=['get'])
-    def overdue(self, request):
-        """Get overdue correspondence."""
-        today = timezone.now().date()
-        queryset = self.get_queryset().filter(
-            due_date__lt=today
-        ).exclude(status__in=['closed', 'archived'])
-        
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = CorrespondenceListSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = CorrespondenceListSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=['get'])
-    def requires_action(self, request):
-        """Get correspondence that requires action."""
-        queryset = self.get_queryset().filter(requires_action=True)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = CorrespondenceListSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = CorrespondenceListSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-    # =========================================================================
-    # Statistics & Analytics
-    # =========================================================================
-
+   
+    
     @action(detail=False, methods=['get'])
     def statistics(self, request):
         """Get comprehensive correspondence statistics."""
@@ -519,126 +311,3 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
         
         return Response(summary)
 
-    # =========================================================================
-    # Search & Lookup
-    # =========================================================================
-
-    @action(detail=False, methods=['get'])
-    def search(self, request):
-        """Advanced search endpoint."""
-        query = request.query_params.get('q', '')
-        if not query:
-            return Response([])
-        
-        queryset = self.get_queryset().filter(
-            Q(reference_number__icontains=query) |
-            Q(external_reference__icontains=query) |
-            Q(subject__icontains=query) |
-            Q(summary__icontains=query) |
-            Q(contact_name__icontains=query)
-        )[:20]
-        
-        serializer = CorrespondenceListSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=['get'])
-    def by_reference(self, request):
-        """Lookup correspondence by reference number."""
-        reference = request.query_params.get('reference')
-        if not reference:
-            return Response(
-                {'error': 'reference parameter is required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        correspondence = get_object_or_404(
-            Correspondence, reference_number=reference
-        )
-        serializer = CorrespondenceSerializer(correspondence)
-        return Response(serializer.data)
-
-    # =========================================================================
-    # Bulk Operations
-    # =========================================================================
-
-    @action(detail=False, methods=['post'])
-    def bulk_assign(self, request):
-        """Assign multiple correspondence items to a user."""
-        correspondence_ids = request.data.get('correspondence_ids', [])
-        user_id = request.data.get('user_id')
-        
-        if not correspondence_ids or not user_id:
-            return Response(
-                {'error': 'correspondence_ids and user_id are required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        assigned_user = get_object_or_404(User, id=user_id)
-        
-        updated = Correspondence.objects.filter(
-            id__in=correspondence_ids
-        ).update(
-            assigned_to=assigned_user,
-            assigned_by=request.user,
-            assigned_at=timezone.now()
-        )
-        return Response({
-            'message': f'{updated} correspondence item(s) assigned',
-            'assigned_to': assigned_user.name
-        })
-
-    @action(detail=False, methods=['post'])
-    def bulk_status_change(self, request):
-        """Change status of multiple correspondence items."""
-        correspondence_ids = request.data.get('correspondence_ids', [])
-        new_status = request.data.get('status')
-        
-        if not correspondence_ids or not new_status:
-            return Response(
-                {'error': 'correspondence_ids and status are required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        valid_statuses = [s[0] for s in Correspondence.STATUS_CHOICES]
-        if new_status not in valid_statuses:
-            return Response(
-                {'error': f'Invalid status. Must be one of: {valid_statuses}'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        updated = Correspondence.objects.filter(
-            id__in=correspondence_ids
-        ).update(status=new_status)
-        
-        return Response({
-            'message': f'{updated} correspondence item(s) updated',
-            'new_status': new_status
-        })
-
-    # =========================================================================
-    # Dropdown Options
-    # =========================================================================
-
-    @action(detail=False, methods=['get'])
-    def options(self, request):
-        """Get all dropdown options for correspondence forms."""
-        options = {
-            'types': [
-                {'value': c[0], 'label': c[1]}
-                for c in Correspondence.TYPE_CHOICES
-            ],
-            'statuses': [
-                {'value': c[0], 'label': c[1]}
-                for c in Correspondence.STATUS_CHOICES
-            ],
-            'priorities': [
-                {'value': c[0], 'label': c[1]}
-                for c in Correspondence.PRIORITY_CHOICES
-            ],
-            'users': list(
-                User.objects.filter(is_active=True)
-                .values('id', 'name', 'email', 'role')
-            ),
-        }
-        
-        return Response(options)

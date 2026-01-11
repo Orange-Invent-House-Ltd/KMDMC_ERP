@@ -136,7 +136,7 @@ class StaffsProfileViewSet(viewsets.ModelViewSet):
         )
         return response
 
-    def retrieve(self, request):
+    def retrieve(self, request, pk = None):
         instance = self.get_object()
         serializer = self.get_serializer(instance, context={'request': request})
         return Response(
