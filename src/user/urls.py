@@ -2,16 +2,14 @@ from django.urls import path
 
 from user.views.login import LoginView
 from user.views.register import RegisterView
-from user.views.verify import VerifyUserView
 from user.views.password import (
     ChangePasswordView,
     ForgotPasswordView,
     ResetPasswordView,
 )
-from user.views.user import LogoutView, UserUpdateView
+from user.views.user import LogoutView
 from user.views.staff_profile import (
     StaffProfileView,
-    StaffTasksView,
     StaffCorrespondencesView,
 )
 
@@ -23,8 +21,6 @@ urlpatterns = [
     path("register/", RegisterView.as_view(), name="register"),
     path("logout/", LogoutView.as_view(), name="logout"),
     
-    # Verification
-    path("verify/", VerifyUserView.as_view(), name="verify_user"),
     
     # Password management
     path("forgot-password/", ForgotPasswordView.as_view(), name="forgot_password"),
@@ -32,11 +28,7 @@ urlpatterns = [
     path("change-password/", ChangePasswordView.as_view(), name="change_password"),
     
     
-    # User management (admin)
-    path("users/<int:user_id>/", UserUpdateView.as_view(), name="user_update"),
-    
     # Staff Profile
-    path("me/", StaffProfileView.as_view(), name="staff_profile"),
-    path("me/tasks/", StaffTasksView.as_view(), name="staff_tasks"),
-    path("me/correspondences/", StaffCorrespondencesView.as_view(), name="staff_correspondences"),
+    path("staff/profile/", StaffProfileView.as_view(), name="staff_profile"),
+    path("staff/correspondences/", StaffCorrespondencesView.as_view(), name="staff_correspondences"),
 ]

@@ -5,7 +5,6 @@ from .staff_profile import (
     StaffListSerializer,
     StaffProfileSerializer,
     StaffProfileUpdateSerializer,
-    StaffTaskSerializer,
     StaffActivitySerializer,
     PerformanceRecordSerializer,
 )

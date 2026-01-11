@@ -8,7 +8,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.utils import timezone
-
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -255,70 +255,3 @@ class PerformanceRecord(models.Model):
         return 0
 
 
-class StaffTask(models.Model):
-    """Tasks assigned to staff members."""
-    STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('in_progress', 'In Progress'),
-        ('completed', 'Completed'),
-        ('overdue', 'Overdue'),
-        ('cancelled', 'Cancelled'),
-    ]
-    
-    PRIORITY_CHOICES = [
-        ('low', 'Low'),
-        ('normal', 'Normal'),
-        ('high', 'High'),
-        ('urgent', 'Urgent'),
-    ]
-
-    title = models.CharField(max_length=500)
-    description = models.TextField(blank=True, null=True)
-    assigned_to = models.ForeignKey(
-        CustomUser,
-        on_delete=models.CASCADE,
-        related_name='staff_assigned_tasks'
-    )
-    assigned_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='staff_tasks_assigned'
-    )
-    department = models.ForeignKey(
-        Department,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='staff_tasks'
-    )
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='normal')
-    due_date = models.DateField(null=True, blank=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
-    
-    # Related items
-    related_type = models.CharField(max_length=50, blank=True, null=True, help_text="e.g., 'memo', 'correspondence', 'approval'")
-    related_id = models.IntegerField(null=True, blank=True)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['-priority', 'due_date', '-created_at']
-
-    def __str__(self):
-        return self.title[:50]
-
-    @property
-    def is_overdue(self):
-        if self.due_date and self.status not in ['completed', 'cancelled']:
-            return self.due_date < timezone.now().date()
-        return False
-
-    @property
-    def days_until_due(self):
-        if self.due_date:
-            delta = self.due_date - timezone.now().date()
-            return delta.days
-        return None

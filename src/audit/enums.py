@@ -40,7 +40,7 @@ class AuditTypeEnum(CustomEnum):
     # User Management
     INVITE_USER = "invite_user", "Invited User"
     DEACTIVATE_USER = "deactivate_user", "Deactivated User"
-    ACTIVATE_USER = "activate_user", "Activated User"
+    APPROVE_USER = "approve_user", "Approved User"
     RESTRICT_USER = "restrict_user", "Restricted User"
     UNRESTRICT_USER = "unrestrict_user", "Unrestricted User"
     REMOVE_ADMIN_USER = "remove_admin_user", "Removed Admin User"

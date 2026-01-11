@@ -2,7 +2,7 @@ from .login import LoginView
 from .register import RegisterView
 from .password import ForgotPasswordView, ResetPasswordView, ChangePasswordView
 from .user import LogoutView
-from .staff_profile import StaffProfileView, StaffTasksView, StaffCorrespondencesView
+from .staff_profile import StaffProfileView, StaffCorrespondencesView
 
 __all__ = [
     "LoginView",
@@ -11,8 +11,6 @@ __all__ = [
     "ResetPasswordView",
     "ChangePasswordView",
     "LogoutView",
-    "UserProfileView",
     "StaffProfileView",
-    "StaffTasksView",
     "StaffCorrespondencesView",
 ]

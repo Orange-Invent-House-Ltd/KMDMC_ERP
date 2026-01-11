@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
 
-from .models import CustomUser, Department, StaffActivity, PerformanceRecord, StaffTask
+from .models import CustomUser, Department, StaffActivity, PerformanceRecord
 
 
 @admin.register(Department)
@@ -83,44 +83,3 @@ class PerformanceRecordAdmin(admin.ModelAdmin):
     completion_rate.short_description = 'Completion Rate'
 
 
-@admin.register(StaffTask)
-class StaffTaskAdmin(admin.ModelAdmin):
-    list_display = ['title_short', 'assigned_to', 'assigned_by', 'status_badge', 'priority_badge', 'due_date', 'created_at']
-    list_filter = ['status', 'priority', 'department', 'due_date']
-    search_fields = ['title', 'description', 'assigned_to__name', 'assigned_by__name']
-    ordering = ['-created_at']
-    raw_id_fields = ['assigned_to', 'assigned_by', 'department']
-    date_hierarchy = 'created_at'
-
-    def title_short(self, obj):
-        return obj.title[:50] + '...' if len(obj.title) > 50 else obj.title
-    title_short.short_description = 'Title'
-
-    def status_badge(self, obj):
-        colors = {
-            'pending': '#ffc107',
-            'in_progress': '#17a2b8',
-            'completed': '#28a745',
-            'overdue': '#dc3545',
-            'cancelled': '#6c757d',
-        }
-        color = colors.get(obj.status, '#6c757d')
-        return format_html(
-            '<span style="background-color: {}; color: white; padding: 3px 8px; border-radius: 3px; font-size: 11px;">{}</span>',
-            color, obj.get_status_display()
-        )
-    status_badge.short_description = 'Status'
-
-    def priority_badge(self, obj):
-        colors = {
-            'low': '#6c757d',
-            'normal': '#17a2b8',
-            'high': '#ffc107',
-            'urgent': '#dc3545',
-        }
-        color = colors.get(obj.priority, '#6c757d')
-        return format_html(
-            '<span style="background-color: {}; color: white; padding: 3px 8px; border-radius: 3px; font-size: 11px;">{}</span>',
-            color, obj.get_priority_display()
-        )
-    priority_badge.short_description = 'Priority'

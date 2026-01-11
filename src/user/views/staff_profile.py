@@ -4,7 +4,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from user.serializers.staff_profile import (
     StaffProfileSerializer,
-    StaffTaskSerializer,
     StaffCorrespondenceSerializer,
 )
 
@@ -20,23 +19,6 @@ class StaffProfileView(APIView):
         return Response(
             success=True,
             message="Profile retrieved successfully",
-            data=serializer.data,
-            status_code=status.HTTP_200_OK,
-        )
-
-
-class StaffTasksView(APIView):
-    """View for current user's tasks."""
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        """Get current user's tasks."""
-        tasks = request.user.staff_assigned_tasks.all()
-        serializer = StaffTaskSerializer(tasks, many=True, context={'request': request})
-        
-        return Response(
-            success=True,
-            message="Tasks retrieved successfully",
             data=serializer.data,
             status_code=status.HTTP_200_OK,
         )

@@ -1,0 +1,84 @@
+from rest_framework import serializers
+from django.utils import timezone
+from tasks.models import Task
+from user.serializers.user import UserMinimalSerializer
+
+
+class TaskSerializer(serializers.ModelSerializer):
+    """Full task serializer for reading and admin updates."""
+    assigned_to_details = UserMinimalSerializer(source='assigned_to', read_only=True)
+    assigned_by_details = UserMinimalSerializer(source='assigned_by', read_only=True)
+
+    class Meta:
+        model = Task
+        fields = [
+            'id',
+            'title',
+            'description',
+            'assigned_to',
+            'assigned_to_details',
+            'assigned_by',
+            'assigned_by_details',
+            'priority',
+            'status',
+            'deadline',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = ['id', 'assigned_by', 'created_at', 'updated_at']
+
+
+class TaskCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating tasks."""
+
+    class Meta:
+        model = Task
+        fields = [
+            'id',
+            'title',
+            'description',
+            'assigned_to',
+            'priority',
+            'status',
+            'deadline',
+        ]
+        read_only_fields = ['id']
+
+    def validate_deadline(self, value):
+        """Ensure deadline is not in the past."""
+        if value and value < timezone.now().date():
+            raise serializers.ValidationError("Deadline cannot be in the past.")
+        return value
+
+    def validate_assigned_to(self, value):
+        """Ensure task is not assigned to the creator."""
+        request = self.context.get('request')
+        if request and request.user == value:
+            raise serializers.ValidationError("You cannot assign a task to yourself.")
+        return value
+
+
+class TaskStatusUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for non-admin users - only status can be updated."""
+
+    class Meta:
+        model = Task
+        fields = ['id', 'status']
+        read_only_fields = ['id']
+
+
+class TaskAdminUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for admin users - all fields can be updated."""
+
+    class Meta:
+        model = Task
+        fields = [
+            'id',
+            'title',
+            'description',
+            'assigned_to',
+            'priority',
+            'status',
+            'deadline',
+        ]
+        read_only_fields = ['id']
