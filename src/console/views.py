@@ -115,7 +115,7 @@ class StaffsProfileViewSet(viewsets.ModelViewSet):
     ordering_fields = ['name', 'employee_id', 'created_at', 'department__name']
     ordering = ['name']
     pagination_class = CustomPagination
-    queryset = CustomUser.objects.filter(role = "general_staff").select_related('department').all()
+    queryset = CustomUser.objects.all()
     
 
     def get_serializer_class(self):
