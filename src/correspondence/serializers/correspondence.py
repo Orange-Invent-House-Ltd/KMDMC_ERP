@@ -89,6 +89,7 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
             'category',
             'is_confidential',
             'note',
+            'external_sender',
         ]
 
     def validate(self, attrs):
@@ -102,7 +103,11 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context['request'].user
         validated_data['sender'] = user
-        # validated_data['reference_number'] = Correspondence._generate_reference()
+        if not validated_data.get('requires_action') or validated_data.get('requires_action') is False:
+            validated_data["due_date"] = None
+            validated_data['status'] = None
+        else :
+            validated_data['status'] = 'pending_action'
         correspondence = super().create(validated_data)
         return correspondence
 
