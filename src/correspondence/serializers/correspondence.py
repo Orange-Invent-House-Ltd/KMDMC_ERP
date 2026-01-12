@@ -33,6 +33,7 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Correspondence
         fields = [
+            'id',
             'subject',
             'status', 'priority', 'requires_action',
             'due_date',
