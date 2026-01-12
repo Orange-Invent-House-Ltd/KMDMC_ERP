@@ -12,6 +12,8 @@ class Correspondence(models.Model):
 
     STATUS_CHOICES = [
         ('pending_action', 'Pending_Needs_Approval'),
+        ('new', 'New'),
+        ("read", "Read"),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
         ('archived', 'Archived'),
@@ -58,7 +60,7 @@ class Correspondence(models.Model):
     reference_number = models.CharField(max_length=100, unique=True)
     external_sender = models.CharField(max_length=255, blank=True)
     subject = models.CharField(max_length=255)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, null=True, default= None)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="new")
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='normal')
     requires_action = models.BooleanField(default=False)
     due_date = models.DateField(null=True, blank=True)

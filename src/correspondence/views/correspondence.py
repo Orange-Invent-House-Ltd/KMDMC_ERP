@@ -11,7 +11,6 @@ from audit.enums import AuditModuleEnum, AuditStatusEnum, AuditTypeEnum, LogPara
 from audit.tasks import log_audit_event_task
 from correspondence.models import Correspondence
 from correspondence.serializers import (
-    CorrespondenceSerializer,
     CorrespondenceListSerializer,
     CorrespondenceCreateSerializer,
     CorrespondenceUpdateSerializer
@@ -48,7 +47,7 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
             return CorrespondenceCreateSerializer
         elif self.action in ['update', 'partial_update']:
             return CorrespondenceUpdateSerializer
-        return CorrespondenceSerializer
+        return CorrespondenceListSerializer
 
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):

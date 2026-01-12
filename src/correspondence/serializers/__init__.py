@@ -1,5 +1,4 @@
 from .correspondence import (
-    CorrespondenceSerializer,
     CorrespondenceListSerializer,
     CorrespondenceCreateSerializer,
     CorrespondenceUpdateSerializer,
@@ -9,7 +8,6 @@ from .correspondence import (
 
 __all__ = [
     # Correspondence
-    'CorrespondenceSerializer',
     'CorrespondenceListSerializer',
     'CorrespondenceCreateSerializer',
     'CorrespondenceUpdateSerializer',
