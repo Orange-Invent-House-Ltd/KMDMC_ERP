@@ -85,7 +85,6 @@ class CustomUser(AbstractUser):
     
     # Staff Profile Fields
     employee_id = models.CharField(max_length=20, unique=True, null=True, blank=True)
-    position = models.CharField(max_length=255, blank=True, null=True, help_text="Job title/position")
     department = models.ForeignKey(
         Department,
         on_delete=models.SET_NULL,

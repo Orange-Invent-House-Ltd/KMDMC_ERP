@@ -6,29 +6,11 @@ from user.models import CustomUser, Department
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=255, help_text="User's full name")
-    username = serializers.CharField(
-        max_length=150,
-        help_text="User's username (used for login)"
-    )
-    email = serializers.EmailField(help_text="User's email address")
     department = serializers.PrimaryKeyRelatedField(
         queryset=Department.objects.all(),
         required=False,
         allow_null=True,
         help_text="User's department ID"
-    )
-    phone = serializers.CharField(
-        max_length=50,
-        required=False,
-        allow_blank=True,
-        allow_null=True,
-        help_text="User's phone number (optional)"
-    )
-    role = serializers.ChoiceField(
-        choices=CustomUser.ROLE_CHOICES,
-        default='general_staff',
-        help_text="User's role in the organization"
     )
     password = serializers.CharField(
         write_only=True,

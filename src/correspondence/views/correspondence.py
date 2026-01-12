@@ -27,10 +27,7 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing correspondence (incoming and outgoing mail).
     """
-    queryset = Correspondence.objects.select_related(
-        'category', 'classification',
-        'assigned_to', 'assigned_by', 'logged_by'
-    ).prefetch_related('documents', 'activities', 'comments').all()
+    queryset = Correspondence.objects.all()
     permission_classes = [IsAuthenticated]
     filterset_fields = [
         'correspondence_type', 'status', 'priority',
@@ -217,97 +214,97 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
 
    
     
-    @action(detail=False, methods=['get'])
-    def statistics(self, request):
-        """Get comprehensive correspondence statistics."""
-        today = timezone.now().date()
-        queryset = self.get_queryset()
+    # @action(detail=False, methods=['get'])
+    # def statistics(self, request):
+    #     """Get comprehensive correspondence statistics."""
+    #     today = timezone.now().date()
+    #     queryset = self.get_queryset()
         
-        # Base counts
-        total = queryset.count()
-        incoming = queryset.filter(correspondence_type='incoming').count()
-        outgoing = queryset.filter(correspondence_type='outgoing').count()
+    #     # Base counts
+    #     total = queryset.count()
+    #     incoming = queryset.filter(correspondence_type='incoming').count()
+    #     outgoing = queryset.filter(correspondence_type='outgoing').count()
         
-        # Status counts
-        by_status = {}
-        for status_code, status_name in Correspondence.STATUS_CHOICES:
-            count = queryset.filter(status=status_code).count()
-            by_status[status_code] = {
-                'label': status_name,
-                'count': count
-            }
+    #     # Status counts
+    #     by_status = {}
+    #     for status_code, status_name in Correspondence.STATUS_CHOICES:
+    #         count = queryset.filter(status=status_code).count()
+    #         by_status[status_code] = {
+    #             'label': status_name,
+    #             'count': count
+    #         }
         
-        # Priority counts
-        by_priority = {}
-        for priority_code, priority_name in Correspondence.PRIORITY_CHOICES:
-            count = queryset.filter(priority=priority_code).count()
-            by_priority[priority_code] = {
-                'label': priority_name,
-                'count': count
-            }
+    #     # Priority counts
+    #     by_priority = {}
+    #     for priority_code, priority_name in Correspondence.PRIORITY_CHOICES:
+    #         count = queryset.filter(priority=priority_code).count()
+    #         by_priority[priority_code] = {
+    #             'label': priority_name,
+    #             'count': count
+    #         }
         
-        # Category breakdown
-        by_category = list(
-            queryset.exclude(category__isnull=True)
-            .values('category__id', 'category__name', 'category__color')
-            .annotate(count=Count('id'))
-            .order_by('-count')
-        )
+    #     # Category breakdown
+    #     by_category = list(
+    #         queryset.exclude(category__isnull=True)
+    #         .values('category__id', 'category__name', 'category__color')
+    #         .annotate(count=Count('id'))
+    #         .order_by('-count')
+    #     )
         
-        # Overdue count
-        overdue = queryset.filter(
-            due_date__lt=today
-        ).exclude(status__in=['closed', 'archived']).count()
+    #     # Overdue count
+    #     overdue = queryset.filter(
+    #         due_date__lt=today
+    #     ).exclude(status__in=['closed', 'archived']).count()
         
-        # Recent trend (last 7 days)
-        recent_trend = []
-        for i in range(7):
-            date = today - timedelta(days=i)
-            count = queryset.filter(created_at__date=date).count()
-            recent_trend.append({
-                'date': date.isoformat(),
-                'count': count
-            })
-        recent_trend.reverse()
+    #     # Recent trend (last 7 days)
+    #     recent_trend = []
+    #     for i in range(7):
+    #         date = today - timedelta(days=i)
+    #         count = queryset.filter(created_at__date=date).count()
+    #         recent_trend.append({
+    #             'date': date.isoformat(),
+    #             'count': count
+    #         })
+    #     recent_trend.reverse()
         
-        stats = {
-            'total': total,
-            'incoming': incoming,
-            'outgoing': outgoing,
-            'pending_action': by_status.get('pending_action', {}).get('count', 0),
-            'in_progress': by_status.get('in_progress', {}).get('count', 0),
-            'overdue': overdue,
-            'by_status': by_status,
-            'by_category': by_category,
-            'by_priority': by_priority,
-            'recent_trend': recent_trend,
-        }
+    #     stats = {
+    #         'total': total,
+    #         'incoming': incoming,
+    #         'outgoing': outgoing,
+    #         'pending_action': by_status.get('pending_action', {}).get('count', 0),
+    #         'in_progress': by_status.get('in_progress', {}).get('count', 0),
+    #         'overdue': overdue,
+    #         'by_status': by_status,
+    #         'by_category': by_category,
+    #         'by_priority': by_priority,
+    #         'recent_trend': recent_trend,
+    #     }
         
-        return Response(stats)
+    #     return Response(stats)
 
-    @action(detail=False, methods=['get'])
-    def dashboard_summary(self, request):
-        """Get summary data for dashboard widgets."""
-        today = timezone.now().date()
-        last_7_days = today - timedelta(days=7)
-        queryset = self.get_queryset()
+    # @action(detail=False, methods=['get'])
+    # def dashboard_summary(self, request):
+    #     """Get summary data for dashboard widgets."""
+    #     today = timezone.now().date()
+    #     last_7_days = today - timedelta(days=7)
+    #     queryset = self.get_queryset()
         
-        summary = {
-            'total_incoming': queryset.filter(correspondence_type='incoming').count(),
-            'total_outgoing': queryset.filter(correspondence_type='outgoing').count(),
-            'new_this_week': queryset.filter(created_at__date__gte=last_7_days).count(),
-            'pending_action': queryset.filter(status='pending_action').count(),
-            'urgent': queryset.filter(priority='urgent').exclude(
-                status__in=['closed', 'archived']
-            ).count(),
-            'overdue': queryset.filter(
-                due_date__lt=today
-            ).exclude(status__in=['closed', 'archived']).count(),
-            'my_assignments': queryset.filter(assigned_to=request.user).count(),
-            'recent': CorrespondenceListSerializer(
-                queryset[:5], many=True
-            ).data,
-        }
+    #     summary = {
+    #         'total_incoming': queryset.filter(correspondence_type='incoming').count(),
+    #         'total_outgoing': queryset.filter(correspondence_type='outgoing').count(),
+    #         'new_this_week': queryset.filter(created_at__date__gte=last_7_days).count(),
+    #         'pending_action': queryset.filter(status='pending_action').count(),
+    #         'urgent': queryset.filter(priority='urgent').exclude(
+    #             status__in=['closed', 'archived']
+    #         ).count(),
+    #         'overdue': queryset.filter(
+    #             due_date__lt=today
+    #         ).exclude(status__in=['closed', 'archived']).count(),
+    #         'my_assignments': queryset.filter(assigned_to=request.user).count(),
+    #         'recent': CorrespondenceListSerializer(
+    #             queryset[:5], many=True
+    #         ).data,
+    #     }
         
-        return Response(summary)
+    #     return Response(summary)
 

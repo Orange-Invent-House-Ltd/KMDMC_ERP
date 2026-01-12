@@ -21,15 +21,15 @@ class DepartmentAdmin(admin.ModelAdmin):
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
-    list_display = ['email', 'name', 'employee_id', 'position', 'role', 'is_verified', 'is_active', 'created_at']
+    list_display = ['email', 'name', 'employee_id', 'role', 'is_verified', 'is_active', 'created_at']
     list_filter = ['role', 'location', 'is_verified', 'is_active', 'is_staff']
-    search_fields = ['email', 'name', 'phone', 'employee_id', 'position']
+    search_fields = ['email', 'name', 'phone', 'employee_id']
     ordering = ['-created_at']
     
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Personal Info', {'fields': ('name', 'phone', 'date_of_birth', 'profile_photo', 'bio')}),
-        ('Staff Profile', {'fields': ('employee_id', 'position', 'department', 'location', 'date_joined_org', 'reports_to')}),
+        ('Staff Profile', {'fields': ('employee_id', 'department', 'location', 'date_joined_org', 'reports_to')}),
         ('Contact', {'fields': ('office_phone', 'office_extension')}),
         ('Performance', {'fields': ('performance_score', 'performance_points')}),
         ('Role & Permissions', {'fields': ('role', 'is_verified', 'is_active', 'is_staff', 'is_superuser')}),
@@ -40,7 +40,7 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'name', 'employee_id', 'position', 'department', 'role', 'password1', 'password2'),
+            'fields': ('email', 'name', 'employee_id', 'department', 'role', 'password1', 'password2'),
         }),
     )
     
