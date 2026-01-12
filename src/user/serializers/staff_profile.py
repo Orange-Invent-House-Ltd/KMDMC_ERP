@@ -25,7 +25,7 @@ class StaffCorrespondenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Correspondence
         fields = [
-            'id', 'subject', 'status', 'priority', 'due_date', 'assigned_to'
+            'id', 'subject', 'status', 'priority', 'due_date'
         ]
 
 class PerformanceRecordSerializer(serializers.ModelSerializer):
@@ -60,7 +60,7 @@ class StaffListSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = [
-            'id', 'name', 'email', 'employee_id', 'position',
+            'id', 'name', 'email', 'employee_id',
             'department_name', 'location', 'location_display',
             'role', 'role_display', 'initials', 'profile_photo_url',
             'is_active'
@@ -85,7 +85,7 @@ class StaffProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = [
-            'id', "name", 'email', 'department', 'position', "location", 'date_joined', "employee_id",
+            'id', "name", 'email', 'department', "role", "location", 'date_joined', "employee_id",
             'is_active', 'is_staff', 'activity', 'performance', 'correspondence', 'task_summary'
         ]
 
@@ -117,7 +117,7 @@ class StaffProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = [
-            'name', 'phone', 'position', 'department_id', 'location',
+            'name', 'phone', 'role', 'department_id', 'location',
             'date_joined_org', 'profile_photo', 'bio',
             'office_phone', 'office_extension', 'reports_to_id'
         ]
