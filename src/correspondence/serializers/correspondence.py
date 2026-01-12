@@ -27,9 +27,8 @@ class CorrespondenceUserSerializer(serializers.ModelSerializer):
 
 class CorrespondenceSerializer(serializers.ModelSerializer):
     """Full serializer for Correspondence model with all related data."""
-    assigned_to = CorrespondenceUserSerializer(read_only=True)
-    assigned_by = CorrespondenceUserSerializer(read_only=True)
-    logged_by = CorrespondenceUserSerializer(read_only=True)
+    receiver = serializers.CharField(source='receiver.name', read_only=True)
+    sender = serializers.CharField(source='sender.name', read_only=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     priority_display = serializers.CharField(source='get_priority_display', read_only=True)
 
@@ -38,9 +37,8 @@ class CorrespondenceSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'subject',
             'status', 'status_display', 'priority', 'priority_display',
-            'requires_action', 'due_date', 
-            'assigned_to', 'assigned_by',
-            'logged_by',
+            'requires_action', 'due_date',
+            'receiver', 'sender',
             'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
@@ -62,7 +60,7 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
         model = Correspondence
         fields = [
             'id', 'subject',
-            'status', 'status_display', 'priority', 'priority_display',
+            'status', 'status_display', 'priority_display',
             'requires_action',
             'due_date',
             'assigned_to_name', 'is_overdue',
@@ -77,12 +75,7 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
 
 class CorrespondenceCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating new correspondence."""
-    assigned_to_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        source='assigned_to',
-        required=False,
-        allow_null=True
-    )
+    reference_number = serializers.CharField(read_only=True)
 
     class Meta:
         model = Correspondence
@@ -90,63 +83,53 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
             'subject',
             'status', 'priority', 'requires_action',
             'due_date',
-            'assigned_to_id'
+            'receiver',
+            'reference_number',
+            'through',
+            'category',
+            'is_confidential',
+            'note',
         ]
+
+    def validate(self, attrs):
+        user = self.context['request'].user
+        if attrs.get('receiver') == user:
+            raise serializers.ValidationError("You cannot assign correspondence to yourself.")
+        if attrs.get('due_date') and attrs['due_date'] < timezone.now().date():
+            raise serializers.ValidationError("Due date cannot be in the past.")
+        return attrs
 
     def create(self, validated_data):
         user = self.context['request'].user
-        validated_data['logged_by'] = user
-        
-        # If assigning to someone, record assignment details
-        if validated_data.get('assigned_to'):
-            validated_data['assigned_by'] = user        
+        validated_data['sender'] = user
+        # validated_data['reference_number'] = Correspondence._generate_reference()
         correspondence = super().create(validated_data)
         return correspondence
 
 
+
 class CorrespondenceUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating correspondence."""
-    assigned_to_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        source='assigned_to',
-        required=False,
-        allow_null=True
-    )
-
     class Meta:
         model = Correspondence
         fields = [
             'subject',
             'status', 'priority', 'requires_action',
             'due_date',
-            'assigned_to_id'
+            'receiver',
         ]
 
-    # def update(self, instance, validated_data):
-    #     user = self.context['request'].user
-    #     old_status = instance.status
-    #     old_assigned_to = instance.assigned_to
+    def update(self, instance, validated_data):
+        user = self.context['request'].user
+        old_receiver = instance.receiver
+
+        # Check if assignment is changing
+        new_receiver = validated_data.get('receiver')
+        if new_receiver and new_receiver != old_receiver:
+            validated_data['assigned_at'] = timezone.now()
         
-    #     # Check if assignment is changing
-    #     new_assigned_to = validated_data.get('assigned_to')
-    #     if new_assigned_to and new_assigned_to != old_assigned_to:
-    #         validated_data['assigned_by'] = user
-    #         validated_data['assigned_at'] = timezone.now()
-        
-    #     correspondence = super().update(instance, validated_data) 
-    #     return correspondence
-
-
-class CorrespondenceAssignSerializer(serializers.Serializer):
-    """Serializer for assigning correspondence to a user."""
-    assigned_to_id = serializers.IntegerField()
-    notes = serializers.CharField(required=False, allow_blank=True)
-
-    def validate_assigned_to_id(self, value):
-        if not User.objects.filter(id=value).exists():
-            raise serializers.ValidationError("User not found.")
-        return value
-
+        correspondence = super().update(instance, validated_data) 
+        return correspondence
 
 class CorrespondenceStatusSerializer(serializers.Serializer):
     """Serializer for changing correspondence status."""

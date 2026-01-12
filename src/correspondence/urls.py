@@ -10,7 +10,7 @@ app_name = 'correspondence'
 router = DefaultRouter()
 
 # Main correspondence endpoints
-router.register(r'correspondence', CorrespondenceViewSet, basename='correspondence')
+router.register(r'', CorrespondenceViewSet, basename='correspondence')
 
 # Supporting entity endpoints
 urlpatterns = [

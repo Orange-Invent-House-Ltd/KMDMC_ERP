@@ -1,5 +1,8 @@
 from django.db import models
 from django.conf import settings
+import uuid
+from utils.utils import generate_random_text
+
 
 
 class Correspondence(models.Model):
@@ -10,11 +13,9 @@ class Correspondence(models.Model):
     ]
 
     STATUS_CHOICES = [
-        ('new', 'New'),
         ('pending_action', 'Pending MD Action'),
-        ('in_progress', 'In Progress'),
-        ('assigned', 'Assigned'),
-        ('replied', 'Replied'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
         ('archived', 'Archived'),
         ('closed', 'Closed'),
     ]
@@ -63,13 +64,16 @@ class Correspondence(models.Model):
     requires_action = models.BooleanField(default=False)
     due_date = models.DateField(null=True, blank=True)
     note = models.TextField(blank=True)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, null=True, blank=True)
+    is_confidential = models.BooleanField(default=False)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.reference_number} - {self.subject[:50]}"
+    
     def save(self, *args, **kwargs):
         if not self.reference_number:
-            self.reference_number = self._generate_reference()
+            self.reference_number = f"REF-{generate_random_text(10).upper()}"
         super().save(*args, **kwargs)
