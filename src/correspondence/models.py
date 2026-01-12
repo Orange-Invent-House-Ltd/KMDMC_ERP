@@ -1,8 +1,6 @@
 from django.db import models
 from django.conf import settings
-import uuid
-from utils.utils import generate_random_text
-
+from django.utils import timezone
 
 
 class Correspondence(models.Model):
@@ -13,7 +11,7 @@ class Correspondence(models.Model):
     ]
 
     STATUS_CHOICES = [
-        ('pending_action', 'Pending MD Action'),
+        ('pending_action', 'Pending_Needs_Approval'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
         ('archived', 'Archived'),
@@ -58,13 +56,16 @@ class Correspondence(models.Model):
     )
 
     reference_number = models.CharField(max_length=100, unique=True)
+    external_sender = models.CharField(max_length=255, blank=True)
     subject = models.CharField(max_length=255)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, null=True, default= None)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='normal')
     requires_action = models.BooleanField(default=False)
     due_date = models.DateField(null=True, blank=True)
     note = models.TextField(blank=True)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, null=True, blank=True)
+    daily_serial = models.PositiveIntegerField(null=True, blank=True)
+    serial_date = models.DateField(null=True, blank=True)
     is_confidential = models.BooleanField(default=False)
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -74,6 +75,19 @@ class Correspondence(models.Model):
         return f"{self.reference_number} - {self.subject[:50]}"
     
     def save(self, *args, **kwargs):
+        today = timezone.now().date()
         if not self.reference_number:
-            self.reference_number = f"REF-{generate_random_text(10).upper()}"
+            last = (
+                Correspondence.objects
+                .filter(serial_date=today)
+                .aggregate(models.Max("daily_serial"))
+                .get("daily_serial__max") or 0
+            )
+
+            self.daily_serial = last + 1
+            self.serial_date = today
+
+            date_str = today.strftime("%d/%m")
+            self.reference_number = f"KDN-{date_str}/{self.daily_serial}"
+
         super().save(*args, **kwargs)
