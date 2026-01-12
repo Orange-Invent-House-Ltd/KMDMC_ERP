@@ -85,7 +85,7 @@ class StaffProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = [
-            'id', 'email', 'department', 'position', 'date_joined', "employee_id",
+            'id', "name", 'email', 'department', 'position', "location", 'date_joined', "employee_id",
             'is_active', 'is_staff', 'activity', 'performance', 'correspondence', 'task_summary'
         ]
 
@@ -121,3 +121,8 @@ class StaffProfileUpdateSerializer(serializers.ModelSerializer):
             'date_joined_org', 'profile_photo', 'bio',
             'office_phone', 'office_extension', 'reports_to_id'
         ]
+        extra_kwargs = {
+            'name': {'required': False},
+            'email': {'required': False},
+            'location': {'required': False},
+        }
