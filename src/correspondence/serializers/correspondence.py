@@ -25,46 +25,25 @@ class CorrespondenceUserSerializer(serializers.ModelSerializer):
 # Main Correspondence Serializers
 # ============================================================================
 
-class CorrespondenceSerializer(serializers.ModelSerializer):
-    """Full serializer for Correspondence model with all related data."""
-    receiver = serializers.CharField(source='receiver.name', read_only=True)
-    sender = serializers.CharField(source='sender.name', read_only=True)
-    status_display = serializers.CharField(source='get_status_display', read_only=True)
-    priority_display = serializers.CharField(source='get_priority_display', read_only=True)
-
-    class Meta:
-        model = Correspondence
-        fields = [
-            'id', 'subject',
-            'status', 'status_display', 'priority', 'priority_display',
-            'requires_action', 'due_date',
-            'receiver', 'sender',
-            'created_at', 'updated_at'
-        ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
-
-    def get_is_overdue(self, obj):
-        if obj.due_date:
-            return timezone.now().date() > obj.due_date
-        return False
-
 
 class CorrespondenceListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for list views (table display)."""
-    assigned_to_name = serializers.CharField(source='assigned_to.name', read_only=True)
-    status_display = serializers.CharField(source='get_status_display', read_only=True)
-    priority_display = serializers.CharField(source='get_priority_display', read_only=True)
     is_overdue = serializers.SerializerMethodField()
 
     class Meta:
         model = Correspondence
         fields = [
-            'id', 'subject',
-            'status', 'status_display', 'priority_display',
-            'requires_action',
+            'subject',
+            'status', 'priority', 'requires_action',
             'due_date',
-            'assigned_to_name', 'is_overdue',
-            'created_at'
+            'receiver',
+            'reference_number',
+            'through',
+            'category',
+            'is_confidential',
+            'note',
+            'external_sender',
+            'is_overdue',
         ]
 
     def get_is_overdue(self, obj):
@@ -105,7 +84,7 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
         validated_data['sender'] = user
         if not validated_data.get('requires_action') or validated_data.get('requires_action') is False:
             validated_data["due_date"] = None
-            validated_data['status'] = None
+            validated_data['status'] = "new"
         else :
             validated_data['status'] = 'pending_action'
         correspondence = super().create(validated_data)
