@@ -45,6 +45,7 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
             'note',
             'external_sender',
             'is_overdue',
+            'created_at',
         ]
 
     def get_is_overdue(self, obj):
