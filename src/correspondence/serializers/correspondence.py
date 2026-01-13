@@ -29,6 +29,8 @@ class CorrespondenceUserSerializer(serializers.ModelSerializer):
 class CorrespondenceListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for list views (table display)."""
     is_overdue = serializers.SerializerMethodField()
+    sender = serializers.CharField(source='sender.name', read_only=True)
+    receiver = serializers.CharField(source='receiver.name', read_only=True)
 
     class Meta:
         model = Correspondence
@@ -47,6 +49,8 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
             'is_overdue',
             'created_at',
             'archived_at',
+            "sender",
+            "receiver"
         ]
 
     def get_is_overdue(self, obj):

@@ -13,6 +13,8 @@ class Correspondence(models.Model):
     STATUS_CHOICES = [
         ('pending_action', 'Pending_Needs_Approval'),
         ('new', 'New'),
+        ('draft', 'Draft'),
+        ('sent', 'Sent'),
         ("read", "Read"),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
