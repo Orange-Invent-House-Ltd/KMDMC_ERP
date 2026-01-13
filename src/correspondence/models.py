@@ -69,7 +69,7 @@ class Correspondence(models.Model):
     daily_serial = models.PositiveIntegerField(null=True, blank=True)
     serial_date = models.DateField(null=True, blank=True)
     is_confidential = models.BooleanField(default=False)
-    
+    archived_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -46,6 +46,7 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
             'external_sender',
             'is_overdue',
             'created_at',
+            'archived_at',
         ]
 
     def get_is_overdue(self, obj):
@@ -103,6 +104,7 @@ class CorrespondenceUpdateSerializer(serializers.ModelSerializer):
             'status', 'priority', 'requires_action',
             'due_date',
             'receiver',
+            'note',
         ]
 
     def update(self, instance, validated_data):
@@ -120,7 +122,12 @@ class CorrespondenceUpdateSerializer(serializers.ModelSerializer):
 class CorrespondenceStatusSerializer(serializers.Serializer):
     """Serializer for changing correspondence status."""
     status = serializers.ChoiceField(choices=Correspondence.STATUS_CHOICES)
-    notes = serializers.CharField(required=False, allow_blank=True)
+
+    def archive(self, correspondence):
+        correspondence.status = 'archived'
+        correspondence.archived_at = timezone.now()
+        correspondence.save(update_fields=["status", "archived_at"])
+        return correspondence
 
 
 class CorrespondenceStatsSerializer(serializers.Serializer):
