@@ -2,7 +2,6 @@ from .correspondence import (
     CorrespondenceListSerializer,
     CorrespondenceCreateSerializer,
     CorrespondenceUpdateSerializer,
-    CorrespondenceStatusSerializer,
     CorrespondenceStatsSerializer,
 )
 

@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "correspondence",
     "audit",
     "tasks",
+    "common",
 ]
 
 MIDDLEWARE = [
