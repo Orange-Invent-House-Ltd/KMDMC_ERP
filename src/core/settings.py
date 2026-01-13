@@ -87,16 +87,24 @@ WSGI_APPLICATION = "core.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-db_name = os.getenv("POSTGRES_DB")
-db_password = os.getenv("POSTGRES_PASSWORD")
-db_host = os.getenv("POSTGRES_HOST")
-db_user = os.getenv("POSTGRES_USER")
-db_port = os.getenv("POSTGRES_PORT")
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
-# Use PostgreSQL if all env vars are set, otherwise fallback to SQLite
-db_uri = f"postgres://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
-db_uri = os.getenv("DATABASE_URL")
-DATABASES = {"default": dj_database_url.parse(db_uri, conn_max_age=600)}
+
+# db_name = os.getenv("POSTGRES_DB")
+# db_password = os.getenv("POSTGRES_PASSWORD")
+# db_host = os.getenv("POSTGRES_HOST")
+# db_user = os.getenv("POSTGRES_USER")
+# db_port = os.getenv("POSTGRES_PORT")
+
+# # Use PostgreSQL if all env vars are set, otherwise fallback to SQLite
+# db_uri = f"postgres://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+# db_uri = os.getenv("DATABASE_URL")
+# DATABASES = {"default": dj_database_url.parse(db_uri, conn_max_age=600)}
 
 
 # Password validation
