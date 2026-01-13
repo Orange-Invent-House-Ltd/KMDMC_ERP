@@ -13,8 +13,7 @@ from correspondence.models import Correspondence
 from correspondence.serializers import (
     CorrespondenceListSerializer,
     CorrespondenceCreateSerializer,
-    CorrespondenceUpdateSerializer,
-    CorrespondenceStatusSerializer
+    CorrespondenceUpdateSerializer
 )
 
 User = get_user_model()
@@ -48,8 +47,6 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
             return CorrespondenceCreateSerializer
         elif self.action in ['update', 'partial_update']:
             return CorrespondenceUpdateSerializer
-        elif self.action == 'archive':
-            return CorrespondenceStatusSerializer
         return CorrespondenceListSerializer
 
     def get_queryset(self):
@@ -61,40 +58,3 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
             return Correspondence.objects.filter(receiver=user)
         queryset = super().get_queryset()
         return queryset
-
-    @action(detail=True, methods=['post'], url_path='archive')
-    def archive(self, request, pk=None, **kwargs):
-        """
-        Archive a correspondence item.
-        """
-        correspondence = self.get_object()
-        serializer = self.get_serializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(
-                success=False,
-                message="Invalid data.",
-                errors=serializer.errors,
-                status_code=status.HTTP_400_BAD_REQUEST
-            )
-        serializer.archive(correspondence)
-
-
-        # # Log the archive action
-        # log_audit_event_task.delay(
-        #     user=request.user,
-        #     module=AuditModuleEnum.CORRESPONDENCE,
-        #     action=AuditTypeEnum.UPDATE,
-        #     status=AuditStatusEnum.SUCCESS,
-        #     params={
-        #         LogParams.CORRESPONDENCE_ID: correspondence.id,
-        #         LogParams.UPDATED_FIELDS: ['is_archived', 'archived_at']
-        #     }
-        # )
-
-        return Response(
-            success=True,
-            message="Correspondence archived successfully.",
-            data=serializer.data,
-            status_code=status.HTTP_204_NO_CONTENT)
-
-    

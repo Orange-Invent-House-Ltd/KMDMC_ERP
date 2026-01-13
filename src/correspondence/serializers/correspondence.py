@@ -34,7 +34,7 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
         model = Correspondence
         fields = [
             'id',
-            'subject',
+            'subject', "type",
             'status', 'priority', 'requires_action',
             'due_date',
             'receiver',
@@ -71,7 +71,9 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
             'category',
             'is_confidential',
             'note',
+            'image',
             'external_sender',
+            "type",
         ]
 
     def validate(self, attrs):
@@ -105,6 +107,8 @@ class CorrespondenceUpdateSerializer(serializers.ModelSerializer):
             'due_date',
             'receiver',
             'note',
+            "type",
+            'md_note',
         ]
 
     def update(self, instance, validated_data):
@@ -115,20 +119,14 @@ class CorrespondenceUpdateSerializer(serializers.ModelSerializer):
         new_receiver = validated_data.get('receiver')
         if new_receiver and new_receiver != old_receiver:
             validated_data['assigned_at'] = timezone.now()
+
+        #set archive date if status is archived
+        if validated_data.get('status') == 'archived':
+            validated_data['archived_at'] = timezone.now()
         
         correspondence = super().update(instance, validated_data) 
         return correspondence
-
-class CorrespondenceStatusSerializer(serializers.Serializer):
-    """Serializer for changing correspondence status."""
-    status = serializers.ChoiceField(choices=Correspondence.STATUS_CHOICES)
-
-    def archive(self, correspondence):
-        correspondence.status = 'archived'
-        correspondence.archived_at = timezone.now()
-        correspondence.save(update_fields=["status", "archived_at"])
-        return correspondence
-
+    
 
 class CorrespondenceStatsSerializer(serializers.Serializer):
     """Serializer for correspondence statistics."""
