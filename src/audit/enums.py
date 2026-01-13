@@ -30,7 +30,8 @@ class AuditStatusEnum(CustomEnum):
 class AuditModuleEnum(CustomEnum):
     AUTH = "auth", "Authentication"
     USER = "user", "User Management"
-    AUDIT = "audit", "Audit Trail" 
+    AUDIT = "audit", "Audit Trail"
+    MEMO = "memo", "Memo Management" 
     
 
 class AuditTypeEnum(CustomEnum):
@@ -52,7 +53,15 @@ class AuditTypeEnum(CustomEnum):
     CHANGE_CORRESPONDENCE_STATUS = "change_correspondence_status", "Changed Correspondence Status"
     ARCHIVE_CORRESPONDENCE = "archive_correspondence", "Archived Correspondence"
 
-    
+    # Memo actions
+    CREATE_MEMO = "create_memo", "Created Memo"
+    EDIT_MEMO = "edit_memo", "Edited Memo"
+    SUBMIT_MEMO = "submit_memo", "Submitted Memo"
+    APPROVE_MEMO = "approve_memo", "Approved Memo"
+    REJECT_MEMO = "reject_memo", "Rejected Memo"
+    CANCEL_MEMO = "cancel_memo", "Cancelled Memo"
+    VIEW_MEMO = "view_memo", "Viewed Memo"
+
     # Blog
     ADD_NEW_BLOG = "add_new_blog", "Added New Blog"
     EDIT_BLOG = "edit_blog", "Edited Blog"
