@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from user.models import CustomUser
+from user.models.models import CustomUser
 from core.resources.cache import Cache
 
 

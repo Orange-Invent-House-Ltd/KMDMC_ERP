@@ -17,6 +17,22 @@ ENVIRONMENT = os.environ.get("ENVIRONMENT", None)
 APP_ENV = "🚀 Production" if ENVIRONMENT == "production" else "🚧 Staging"
 
 
+ADMIN_SIDEBAR_MODULES = [
+    "OVERVIEW",
+    "USER",
+    "USER_KYC",
+    "TRANSACTION",
+    "DISPUTE",
+    "MERCHANT",
+    "THIRD_PARTY",
+    "SETTINGS",
+    "EVENT",
+    "REFERRER",
+    "CMS",
+    "EMAIL_PROVIDER",
+    "PAYMENT_GATEWAY",
+]
+
 def parse_datetime(datetime_input):
     try:
         val = str(datetime_input)[:-6]  # Remove timezone offset

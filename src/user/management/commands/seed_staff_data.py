@@ -4,7 +4,7 @@ from django.utils import timezone
 from datetime import timedelta
 import random
 
-from user.models import Department, StaffActivity, PerformanceRecord, StaffTask
+from user.models.models import Department, StaffActivity, PerformanceRecord, StaffTask
 
 User = get_user_model()
 

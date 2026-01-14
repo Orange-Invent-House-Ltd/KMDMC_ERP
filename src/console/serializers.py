@@ -3,7 +3,7 @@ from django.db.models import Count, Avg, Q
 from django.utils import timezone
 from datetime import timedelta
 
-from user.models import Department
+from user.models.models import Department
 from correspondence.models import Correspondence
 
 class DepartmentSerializer(serializers.ModelSerializer):

@@ -25,6 +25,7 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
     """
     queryset = Correspondence.objects.all()
     permission_classes = [IsAuthenticated]
+
     filterset_fields = [
         'correspondence_type', 'status', 'priority',
         'category', 'assigned_to',
