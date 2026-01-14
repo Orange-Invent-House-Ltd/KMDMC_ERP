@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status, mixins
+from rest_framework import viewsets, status, mixins, generics
 from rest_framework.decorators import action
 from utils.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -9,13 +9,17 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from datetime import timedelta
 from utils.pagination import CustomPagination
-from user.models import CustomUser, Department, StaffActivity, PerformanceRecord
+from user.models.models import CustomUser, Department, StaffActivity, PerformanceRecord
 from user.serializers.staff_profile import (
     StaffListSerializer,
     StaffProfileSerializer,
-    StaffProfileUpdateSerializer
+    StaffProfileUpdateSerializer,
+    UserDropdownSerializer
 )
 from console.serializers import DepartmentSerializer
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class DepartmentViewSet(viewsets.ModelViewSet):
@@ -174,3 +178,11 @@ class StaffsProfileViewSet(mixins.ListModelMixin,
         )
     
 
+class UserDropdownListView(generics.ListAPIView):
+    """View for listing active users."""
+    permission_classes = [AllowAny]
+    serializer_class = UserDropdownSerializer
+
+    def get_queryset(self):
+        """Get list of active users."""
+        return User.objects.filter(is_active=True)

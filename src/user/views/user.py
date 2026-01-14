@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from utils.response import Response 
 from audit.enums import AuditModuleEnum, AuditStatusEnum, AuditTypeEnum, LogParams
 from audit.tasks import log_audit_event_task
-from user.models import CustomUser
+from user.models.models import CustomUser
 from user.serializers.user import UserUpdateSerializer, LogoutSerializer
 from utils.activity_log import extract_api_request_metadata
 

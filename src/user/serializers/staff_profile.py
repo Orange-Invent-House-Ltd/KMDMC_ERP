@@ -1,13 +1,11 @@
 from rest_framework import serializers
-from django.db.models import Count, Avg, Q
-from django.utils import timezone
-from datetime import timedelta
-
-from user.models import (CustomUser, Department, StaffActivity,
+from user.models.models import (CustomUser, Department, StaffActivity,
                          PerformanceRecord)
 from correspondence.models import Correspondence
 from tasks.serializers import TaskSummarySerializer 
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 class StaffActivitySerializer(serializers.ModelSerializer):
     """Serializer for staff activity (heatmap data)."""
@@ -126,3 +124,13 @@ class StaffProfileUpdateSerializer(serializers.ModelSerializer):
             'email': {'required': False},
             'location': {'required': False},
         }
+
+class UserDropdownSerializer(serializers.ModelSerializer):
+    label = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ["id", "label"]
+
+    def get_label(self, obj):
+        return f"{obj.name}"

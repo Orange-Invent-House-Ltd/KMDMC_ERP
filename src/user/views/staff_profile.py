@@ -1,4 +1,4 @@
-from rest_framework import status
+from rest_framework import status, generics
 from utils.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -6,7 +6,6 @@ from user.serializers.staff_profile import (
     StaffProfileSerializer,
     StaffCorrespondenceSerializer,
 )
-
 
 class StaffProfileView(APIView):
     """View for current user's profile."""

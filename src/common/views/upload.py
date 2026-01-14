@@ -12,7 +12,8 @@ class UploadMediaView(generics.GenericAPIView):
     serializer_class = UploadMediaSerializer
     permission_classes = [permissions.AllowAny]
     upload_client = FileUploadClient
-    parser_classes = [MultiPartParser, FormParser] 
+    parser_classes = [MultiPartParser, FormParser]
+    swagger_schema = None
 
     def post(self, request):
         user = request.user

@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from correspondence.models import Correspondence
 
+
 User = get_user_model()
 
 
@@ -50,7 +51,8 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
             'created_at',
             'archived_at',
             "sender",
-            "receiver"
+            "receiver",
+            "image_urls"
         ]
 
     def get_is_overdue(self, obj):
@@ -62,6 +64,10 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
 class CorrespondenceCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating new correspondence."""
     reference_number = serializers.CharField(read_only=True)
+    image_urls = serializers.ListField(
+        child=serializers.URLField(),
+        required=False
+    )
 
     class Meta:
         model = Correspondence
@@ -75,7 +81,7 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
             'category',
             'is_confidential',
             'note',
-            'image',
+            'image_urls',
             'external_sender',
             "type",
         ]

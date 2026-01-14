@@ -2,7 +2,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.db import transaction
 from rest_framework import serializers
 
-from user.models import CustomUser, Department
+from user.models.models import CustomUser, Department
 
 
 class RegisterSerializer(serializers.ModelSerializer):

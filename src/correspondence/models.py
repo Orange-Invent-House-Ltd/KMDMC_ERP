@@ -73,7 +73,7 @@ class Correspondence(models.Model):
     is_confidential = models.BooleanField(default=False)
     archived_at = models.DateTimeField(null=True, blank=True)
     type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='internal')
-    image = models.URLField(max_length=500, blank=True)
+    image_urls = models.JSONField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
