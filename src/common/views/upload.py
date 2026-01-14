@@ -7,7 +7,6 @@ from common.serializers import DeleteMediaSerializer, UploadMediaSerializer
 from utils.response import Response
 
 
-
 class UploadMediaView(generics.GenericAPIView):
     serializer_class = UploadMediaSerializer
     permission_classes = [permissions.AllowAny]

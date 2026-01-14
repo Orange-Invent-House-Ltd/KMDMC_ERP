@@ -20,17 +20,11 @@ APP_ENV = "🚀 Production" if ENVIRONMENT == "production" else "🚧 Staging"
 ADMIN_SIDEBAR_MODULES = [
     "OVERVIEW",
     "USER",
-    "USER_KYC",
-    "TRANSACTION",
-    "DISPUTE",
-    "MERCHANT",
-    "THIRD_PARTY",
     "SETTINGS",
-    "EVENT",
-    "REFERRER",
-    "CMS",
-    "EMAIL_PROVIDER",
-    "PAYMENT_GATEWAY",
+    "CORRESPONDENCE",
+    "MEMO",
+    "LEAVE",
+    "RECRUITMENT"
 ]
 
 def parse_datetime(datetime_input):
