@@ -98,9 +98,12 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         validated_data['sender'] = user
         if not validated_data.get('requires_action') or validated_data.get('requires_action') is False:
-            validated_data["due_date"] = None
-            validated_data['status'] = "new"
-        else :
+            if validated_data.get('status') == 'draft':
+                validated_data['status'] = 'draft'
+            else:
+                validated_data["due_date"] = None
+                validated_data['status'] = "new"
+        else:
             validated_data['status'] = 'pending_action'
         correspondence = super().create(validated_data)
         return correspondence
