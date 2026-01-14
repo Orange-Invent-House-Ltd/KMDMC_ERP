@@ -24,20 +24,32 @@ class UploadMediaView(generics.GenericAPIView):
                 errors=serializer.errors,
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
-        image = serializer.validated_data.get("image")
+        images = serializer.validated_data["images"]
 
         cloudinary_folder = f"KND"
-        obj = self.upload_client.execute(
-            file=image, cloudinary_folder=cloudinary_folder
-        )
+        uploaded = []
+        failed = []
+        for image in images:
+            result = self.upload_client.execute(
+                file=image,
+                cloudinary_folder=cloudinary_folder
+            )
 
-        if not obj["success"]:
-            return Response(**obj)
+            if result["success"]:
+                uploaded.append(result["data"])
+            else:
+                failed.append({
+                    "file": image.name,
+                    "error": Response(**result)
+                })
 
         return Response(
             success=True,
-            message=obj["message"],
-            data=obj["data"],
+            message="Files uploaded successfully",
+            data={
+                "uploaded": uploaded,
+                "failed": failed
+            },
             status_code=status.HTTP_200_OK,
         )
 

@@ -61,7 +61,7 @@ class Correspondence(models.Model):
     reference_number = models.CharField(max_length=100, unique=True)
     external_sender = models.CharField(max_length=255, blank=True)
     subject = models.CharField(max_length=255)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="new")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='normal')
     requires_action = models.BooleanField(default=False)
     due_date = models.DateField(null=True, blank=True)
