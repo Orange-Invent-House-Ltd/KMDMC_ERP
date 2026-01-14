@@ -1,7 +1,5 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-
-from user.models import CustomUser
 from .user import UserMinimalSerializer
 
 
