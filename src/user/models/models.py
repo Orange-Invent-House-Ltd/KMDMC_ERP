@@ -9,6 +9,8 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.utils import timezone
 from django.conf import settings
+from user.models.admin import Role
+
 
 logger = logging.getLogger(__name__)
 
@@ -62,13 +64,6 @@ class Department(models.Model):
 
 
 class CustomUser(AbstractUser):
-    ROLE_CHOICES = [
-        ('super_admin', 'Super Admin'),
-        ('director', 'Director'),
-        ('hr_manager', 'HR Manager'),
-        ('general_staff', 'General Staff'),
-    ]
-    
     LOCATION_CHOICES = [
         ('headquarters', 'Headquarters'),
         ('branch_office', 'Branch Office'),
@@ -77,11 +72,16 @@ class CustomUser(AbstractUser):
     ]
 
     username = models.CharField(max_length=150, unique=True)
-    name = models.CharField(max_length=255)
+    role = models.ForeignKey(
+        Role,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
     email = models.EmailField(max_length=255, unique=True)
     phone = models.CharField(max_length=50, unique=True, null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='general_staff')
+
     
     # Staff Profile Fields
     employee_id = models.CharField(max_length=20, unique=True, null=True, blank=True)
@@ -117,24 +117,6 @@ class CustomUser(AbstractUser):
             self.phone = None
         super().save(*args, **kwargs)
 
-    @property
-    def is_super_admin(self):
-        return self.role == 'super_admin'
-
-    @property
-    def is_director(self):
-        return self.role == 'director'
-
-    @property
-    def is_hr_manager(self):
-        return self.role == 'hr_manager'
-
-    @property
-    def is_general_staff(self):
-        return self.role == 'general_staff'
-
-    def role_display(self):
-        return dict(self.ROLE_CHOICES).get(self.role, 'Unknown')
 
     @property
     def initials(self):
@@ -146,9 +128,9 @@ class CustomUser(AbstractUser):
     @property
     def full_position(self):
         """Return position with department context."""
-        if self.position and self.department:
-            return f"{self.position}, {self.department.name}"
-        return self.position or self.role_display
+        if self.role and self.department:
+            return f"{self.role.name}, {self.department.name}"
+        return self.role_display
 
     def generate_employee_id(self):
         """Generate unique employee ID."""
