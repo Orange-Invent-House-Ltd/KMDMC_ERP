@@ -3,6 +3,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from user.models.models import CustomUser, Department
+from user.models.admin import Role
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -22,6 +23,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         style={"input_type": "password"},
         help_text="Confirm password"
     )
+
+    role = serializers.PrimaryKeyRelatedField(queryset=Role.objects.all())
 
     class Meta:
         model = CustomUser
