@@ -4,12 +4,12 @@ from user.models.models import CustomUser
 
 
 class UserMinimalSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(source="get_role_display", read_only=True)
+    department = serializers.CharField(source="department.name")
+
     class Meta:
         model = CustomUser
-        fields = [
-            "name"
-        ]
-        read_only_fields = fields
+        fields = ["id", "name", "role", "department", "email"]
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
