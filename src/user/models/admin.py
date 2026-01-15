@@ -12,6 +12,7 @@ class PermissionModule(Enum):
     MEMO = "MEMO"
     LEAVE = "LEAVE"
     RECRUITMENT = "RECRUITMENT"
+    HR_CONFIG = "HR_CONFIG"
 
     @classmethod
     def choices(cls):
