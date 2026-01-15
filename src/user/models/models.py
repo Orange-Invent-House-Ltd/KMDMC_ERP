@@ -72,6 +72,7 @@ class CustomUser(AbstractUser):
     ]
 
     username = models.CharField(max_length=150, unique=True)
+    name = models.CharField(max_length=255)
     role = models.ForeignKey(
         Role,
         on_delete=models.SET_NULL,
@@ -124,13 +125,16 @@ class CustomUser(AbstractUser):
             parts = self.name.split()
             return ''.join([p[0].upper() for p in parts[:2]])
         return self.email[0].upper() if self.email else 'U'
+    
+    def role_display(self):
+        return self.role.name if self.role else "No Role Assigned"
 
     @property
     def full_position(self):
         """Return position with department context."""
-        if self.role and self.department:
-            return f"{self.role.name}, {self.department.name}"
-        return self.role_display
+        if self.position and self.department:
+            return f"{self.position}, {self.department.name}"
+        return self.position or self.role_display
 
     def generate_employee_id(self):
         """Generate unique employee ID."""

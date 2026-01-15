@@ -21,8 +21,8 @@ class DepartmentAdmin(admin.ModelAdmin):
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
-    list_display = ['email', 'name', 'employee_id', 'role', 'is_verified', 'is_active', 'created_at']
-    list_filter = ['role', 'location', 'is_verified', 'is_active', 'is_staff']
+    list_display = ['email', 'name', 'employee_id', 'is_verified', 'is_active', 'created_at']
+    list_filter = ['location', 'is_verified', 'is_active', 'is_staff']
     search_fields = ['email', 'name', 'phone', 'employee_id']
     ordering = ['-created_at']
     
