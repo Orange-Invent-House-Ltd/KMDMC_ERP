@@ -6,12 +6,11 @@ from django.db import models
 class PermissionModule(Enum):
     SIDEBAR = "SIDEBAR"
     OVERVIEW = "OVERVIEW"
-    USER = "USER"
     SETTINGS = "SETTINGS"
     CORRESPONDENCE = "CORRESPONDENCE"
-    MEMO = "MEMO"
-    LEAVE = "LEAVE"
-    RECRUITMENT = "RECRUITMENT"
+    HR = "HR"
+    EXECUTIVE = "EXECUTIVE"
+    TASKS = "TASKS"
 
     @classmethod
     def choices(cls):

@@ -11,6 +11,8 @@ from user.models.admin import Permission, Role
 from user.serializers.permissions import PermissionSerializer, RoleSerializer
 from utils.pagination import CustomPagination
 from utils.response import Response
+from console.permissions import permissions_required
+from utils.permissions import PERMISSIONS
 
 
 class PermissionViewSet(viewsets.ModelViewSet):
@@ -29,6 +31,7 @@ class PermissionViewSet(viewsets.ModelViewSet):
             200: PermissionSerializer,
         },
     )
+    @permissions_required([PERMISSIONS.CAN_VIEW_PERMISSIONS])
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset())
         qs = self.paginate_queryset(queryset)
@@ -60,6 +63,8 @@ class PermissionViewSet(viewsets.ModelViewSet):
             201: PermissionSerializer,
         },
     )
+
+    @permissions_required([PERMISSIONS.CAN_ADD_PERMISSIONS_TO_ROLE])
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
@@ -83,6 +88,8 @@ class PermissionViewSet(viewsets.ModelViewSet):
             200: PermissionSerializer,
         },
     )
+
+    @permissions_required([PERMISSIONS.CAN_UPDATE_PERMISSIONS])
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
@@ -104,6 +111,8 @@ class PermissionViewSet(viewsets.ModelViewSet):
         operation_description="Delete a permission",
         responses={204: "No content"},
     )
+
+    @permissions_required([PERMISSIONS.CAN_DELETE_PERMISSIONS])
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         self.perform_destroy(instance)
@@ -129,6 +138,7 @@ class RoleViewSet(viewsets.ModelViewSet):
             200: RoleSerializer,
         },
     )
+    @permissions_required([PERMISSIONS.CAN_VIEW_ROLES])
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset())
         qs = self.paginate_queryset(queryset)
@@ -143,6 +153,7 @@ class RoleViewSet(viewsets.ModelViewSet):
         operation_description="Retrieve a role",
         responses={200: RoleSerializer},
     )
+    @permissions_required([PERMISSIONS.CAN_VIEW_ROLES])
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
@@ -160,6 +171,7 @@ class RoleViewSet(viewsets.ModelViewSet):
             201: RoleSerializer,
         },
     )
+    @permissions_required([PERMISSIONS.CAN_ADD_ROLES])
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
@@ -183,6 +195,7 @@ class RoleViewSet(viewsets.ModelViewSet):
             200: RoleSerializer,
         },
     )
+    @permissions_required([PERMISSIONS.CAN_UPDATE_ROLES])
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
@@ -204,6 +217,7 @@ class RoleViewSet(viewsets.ModelViewSet):
         operation_description="Delete a role",
         responses={204: "No content"},
     )
+    @permissions_required([PERMISSIONS.CAN_DELETE_ROLES])
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         # Check if role is assigned to any users before deleting
@@ -234,6 +248,7 @@ class RoleViewSet(viewsets.ModelViewSet):
         ),
         responses={200: RoleSerializer},
     )
+    @permissions_required([PERMISSIONS.CAN_ADD_PERMISSIONS_TO_ROLE])
     @action(detail=True, methods=["post"], url_path="add-permissions")
     def add_permissions(self, request, pk=None):
         role = self.get_object()
@@ -276,6 +291,7 @@ class RoleViewSet(viewsets.ModelViewSet):
         ),
         responses={200: RoleSerializer},
     )
+    @permissions_required([PERMISSIONS.CAN_ADD_PERMISSIONS_TO_ROLE])
     @action(detail=True, methods=["post"], url_path="remove-permissions")
     def remove_permissions(self, request, pk=None):
         role = self.get_object()
