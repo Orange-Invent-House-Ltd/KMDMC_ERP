@@ -138,7 +138,7 @@ class RoleViewSet(viewsets.ModelViewSet):
             200: RoleSerializer,
         },
     )
-    @permissions_required([PERMISSIONS.CAN_VIEW_ROLES])
+    
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset())
         qs = self.paginate_queryset(queryset)
