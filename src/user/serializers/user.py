@@ -4,8 +4,8 @@ from user.models.models import CustomUser
 
 
 class UserMinimalSerializer(serializers.ModelSerializer):
-    role = serializers.CharField(source="get_role_display", read_only=True)
-    department = serializers.CharField(source="department.name")
+    role = serializers.CharField(source="role.name", read_only=True)
+    department = serializers.CharField(source="department.name", read_only=True)
 
     class Meta:
         model = CustomUser

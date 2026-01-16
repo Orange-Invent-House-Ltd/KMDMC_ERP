@@ -9,6 +9,8 @@ from audit.tasks import log_audit_event_task
 from user.models.models import CustomUser
 from user.serializers.user import UserUpdateSerializer, LogoutSerializer
 from utils.activity_log import extract_api_request_metadata
+from console.permissions import permissions_required
+from utils.permissions import PERMISSIONS
 
 class LogoutView(GenericAPIView):
     permission_classes = [IsAuthenticated]
@@ -50,6 +52,7 @@ class MDVerifyUserView(UpdateAPIView):
     lookup_field = 'pk'
     lookup_url_kwarg = 'user_id'
 
+    @permissions_required([PERMISSIONS.CAN_GIVE_FINAL_APPROVAL])
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
