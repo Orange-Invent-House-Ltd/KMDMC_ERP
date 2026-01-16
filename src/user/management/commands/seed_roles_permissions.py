@@ -1,49 +1,153 @@
 from django.core.management.base import BaseCommand
-from user.models.admin import Permission, Role, PermissionModule
+from django.db import transaction
+
+from user.models.admin import Permission, Role
+from utils.permissions import PERMISSIONS, SYSTEM_PERMISSIONS
+
+
+ROLE_PERMISSION_MAP = {
+    "SUPER_ADMIN": {
+        "name": "Super Admin",
+        "description": "Full system control",
+        "permissions": list(SYSTEM_PERMISSIONS.keys()),
+    },
+
+    "MANAGING_DIRECTOR": {
+        "name": "Managing Director",
+        "description": "Executive authority",
+        "permissions": [
+            PERMISSIONS.CAN_VIEW_CORRESPONDENCE,
+            PERMISSIONS.CAN_CREATE_CORRESPONDENCE,
+            PERMISSIONS.CAN_UPDATE_CORRESPONDENCE,
+            PERMISSIONS.CAN_ARCHIVE_CORRESPONDENCE,
+            PERMISSIONS.CAN_GIVE_FINAL_APPROVAL,
+            PERMISSIONS.CAN_DELETE_DEPARTMENT,
+            PERMISSIONS.CAN_DELEGATE_AUTHORITY,
+            PERMISSIONS.CAN_ASSIGN_TASKS,
+            PERMISSIONS.CAN_VIEW_TASKS,
+            PERMISSIONS.CAN_VIEW_DEPARTMENTS,
+            PERMISSIONS.CAN_VIEW_STAFF_DETAILS,
+        ],
+    },
+
+    "GENERAL_MANAGER": {
+        "name": "General Manager",
+        "description": "Department-level management",
+        "permissions": [
+            PERMISSIONS.CAN_VIEW_CORRESPONDENCE,
+            PERMISSIONS.CAN_CREATE_CORRESPONDENCE,
+            PERMISSIONS.CAN_UPDATE_CORRESPONDENCE,
+            PERMISSIONS.CAN_ASSIGN_TASKS,
+            PERMISSIONS.CAN_VIEW_TASKS,
+            PERMISSIONS.CAN_VIEW_DEPARTMENTS,
+            PERMISSIONS.CAN_VIEW_STAFF_DETAILS,
+        ],
+    },
+
+    "SUPERVISOR": {
+        "name": "Supervisor",
+        "description": "Unit-level supervision",
+        "permissions": [
+            PERMISSIONS.CAN_VIEW_CORRESPONDENCE,
+            PERMISSIONS.CAN_CREATE_CORRESPONDENCE,
+            PERMISSIONS.CAN_ASSIGN_TASKS,
+            PERMISSIONS.CAN_VIEW_TASKS,
+            PERMISSIONS.CAN_VIEW_STAFF_DETAILS,
+        ],
+    },
+
+    "HR": {
+        "name": "HR",
+        "description": "Human Resources",
+        "permissions": [
+            PERMISSIONS.CAN_VIEW_DEPARTMENTS,
+            PERMISSIONS.CAN_ADD_DEPARTMENT,
+            PERMISSIONS.CAN_UPDATE_DEPARTMENT,
+            PERMISSIONS.CAN_VIEW_STAFF_DETAILS,
+            PERMISSIONS.CAN_ADD_STAFF,
+            PERMISSIONS.CAN_UPDATE_STAFF,
+        ],
+    },
+
+    "STAFF": {
+        "name": "Staff",
+        "description": "Operational staff",
+        "permissions": [
+            PERMISSIONS.CAN_VIEW_CORRESPONDENCE,
+            PERMISSIONS.CAN_VIEW_TASKS,
+            PERMISSIONS.CAN_EXECUTE_TASKS,
+        ],
+    },
+}
+
 
 class Command(BaseCommand):
-    help = "Seed initial roles and permissions"
+    help = "Seeds, updates, and cleans up ERP permissions and roles"
 
     def handle(self, *args, **options):
-        # Seed permissions
-        permissions = []
-        for module_value, module_label in PermissionModule.choices():
-            perm, created = Permission.objects.get_or_create(
-                name=f"{module_label} Access",
-                module=module_value,
-                defaults={
-                    "description": f"Access to {module_label} features"
-                }
+        self.stdout.write(self.style.MIGRATE_HEADING("Starting permission sync..."))
+        self.stdout.write(f"Found {len(SYSTEM_PERMISSIONS)} permissions")
+
+        created_count = 0
+        updated_count = 0
+        deleted_count = 0
+
+        with transaction.atomic():
+
+            # ----------------------------
+            # Sync Permissions
+            # ----------------------------
+            for name, data in SYSTEM_PERMISSIONS.items():
+                _, created = Permission.objects.update_or_create(
+                    name=name,
+                    defaults={
+                        "description": data["description"],
+                        "module": data["module"],
+                    },
+                )
+
+                if created:
+                    created_count += 1
+                else:
+                    updated_count += 1
+
+            # ----------------------------
+            # Delete Removed Permissions
+            # ----------------------------
+            removed_permissions = Permission.objects.exclude(
+                name__in=SYSTEM_PERMISSIONS.keys()
             )
-            permissions.append(perm)
-            if created:
-                self.stdout.write(self.style.SUCCESS(f"Created permission: {perm.name}"))
-            else:
-                self.stdout.write(f"Permission already exists: {perm.name}")
 
-        # Seed roles
-        admin_role, _ = Role.objects.get_or_create(
-            name="Admin",
-            code="ADMIN",
-            defaults={
-                "description": "Administrator with all permissions"
-            }
-        )
-        admin_role.permissions.set(permissions)
-        admin_role.save()
-        self.stdout.write(self.style.SUCCESS("Admin role seeded."))
+            deleted_count = removed_permissions.count()
+            removed_permissions.delete()
 
-        user_role, _ = Role.objects.get_or_create(
-            name="User",
-            code="USER",
-            defaults={
-                "description": "Standard user with limited permissions"
-            }
-        )
-        # Example: assign only SIDEBAR and OVERVIEW permissions
-        user_perms = [p for p in permissions if p.module in [PermissionModule.SIDEBAR.value, PermissionModule.OVERVIEW.value]]
-        user_role.permissions.set(user_perms)
-        user_role.save()
-        self.stdout.write(self.style.SUCCESS("User role seeded."))
+            # ----------------------------
+            # Sync Roles
+            # ----------------------------
+            self.stdout.write(self.style.MIGRATE_HEADING("Seeding roles..."))
 
-        self.stdout.write(self.style.SUCCESS("Roles and permissions seeding complete."))
+            for code, role_data in ROLE_PERMISSION_MAP.items():
+                role, _ = Role.objects.get_or_create(
+                    code=code,
+                    defaults={
+                        "name": role_data["name"],
+                        "description": role_data["description"],
+                    },
+                )
+
+                perms = Permission.objects.filter(name__in=role_data["permissions"])
+                role.permissions.set(perms)
+
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"✓ {role.name} → {perms.count()} permissions"
+                    )
+                )
+
+        # ----------------------------
+        # Summary
+        # ----------------------------
+        self.stdout.write(self.style.MIGRATE_HEADING("Sync complete"))
+        self.stdout.write(self.style.SUCCESS(f"Created: {created_count}"))
+        self.stdout.write(self.style.SUCCESS(f"Updated: {updated_count}"))
+        self.stdout.write(self.style.WARNING(f"Deleted: {deleted_count}"))
