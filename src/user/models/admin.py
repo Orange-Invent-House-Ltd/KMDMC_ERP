@@ -13,6 +13,7 @@ class PermissionModule(Enum):
     TASKS = "TASKS"
     HR_CONFIG = "HR_CONFIG"
 
+
     @classmethod
     def choices(cls):
         return [(item.value, item.name.replace("_", " ").title()) for item in cls]
