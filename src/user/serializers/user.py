@@ -5,11 +5,17 @@ from user.models.models import CustomUser
 
 class UserMinimalSerializer(serializers.ModelSerializer):
     role = serializers.CharField(source="role.name", read_only=True)
+    permissions = serializers.SerializerMethodField()
     department = serializers.CharField(source="department.name", read_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ["id", "name", "role", "department", "email"]
+        fields = ["id", "name", "role", "permissions", "department", "email"]
+
+    def get_permissions(self, obj):
+        if obj.role:
+            return list(obj.role.permissions.values_list("name", flat=True))
+        return []
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
