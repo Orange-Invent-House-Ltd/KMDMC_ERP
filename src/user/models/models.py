@@ -131,10 +131,11 @@ class CustomUser(AbstractUser):
 
     @property
     def full_position(self):
-        """Return position with department context."""
-        if self.position and self.department:
-            return f"{self.position}, {self.department.name}"
-        return self.position or self.role_display
+        """Return role with department context."""
+        role_name = self.role_display()
+        if self.department:
+            return f"{role_name}, {self.department.name}"
+        return role_name
 
     def generate_employee_id(self):
         """Generate unique employee ID."""
