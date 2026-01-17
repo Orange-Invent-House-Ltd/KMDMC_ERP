@@ -3,11 +3,9 @@ from rest_framework import serializers
 from user.models.models import CustomUser
 from user.models.admin import PermissionModule, Permission
 from utils.utils import ADMIN_SIDEBAR_MODULES
+from user.serializers.permissions import PermissionMinimalSerializer
 
-class PermissionMinimalSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Permission
-        fields = ["id", "name", "module"]    
+
 
 
 class UserMinimalSerializer(serializers.ModelSerializer):
