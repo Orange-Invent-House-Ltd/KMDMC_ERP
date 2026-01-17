@@ -18,7 +18,8 @@ from user.serializers.staff_profile import (
 )
 from console.serializers import DepartmentSerializer
 from django.contrib.auth import get_user_model
-
+from console.permissions import permissions_required
+from utils.permissions import PERMISSIONS
 User = get_user_model()
 
 
@@ -32,6 +33,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     ordering = ['name']
     serializer_class = DepartmentSerializer
 
+    @permissions_required([PERMISSIONS.CAN_VIEW_DEPARTMENTS])
     def list(self, request, *args, **kwargs):
         """Override list to return custom response format."""
         queryset = self.filter_queryset(self.get_queryset())
@@ -49,6 +51,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
+    @permissions_required([PERMISSIONS.CAN_VIEW_DEPARTMENTS])
     def retrieve(self, request, *args, **kwargs):
         """Override retrieve to return custom response format."""
         instance = self.get_object()
@@ -60,6 +63,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
+    @permissions_required([PERMISSIONS.CAN_ADD_DEPARTMENT])
     def create(self, request, *args, **kwargs):
         """Override create to return custom response format."""
         serializer = self.get_serializer(data=request.data)
@@ -77,6 +81,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_201_CREATED
         )
 
+    @permissions_required([PERMISSIONS.CAN_UPDATE_DEPARTMENT])
     def update(self, request, *args, **kwargs):
         """Override update to return custom response format."""
         partial = kwargs.pop('partial', False)
@@ -96,6 +101,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
+    @permissions_required([PERMISSIONS.CAN_DELETE_DEPARTMENT])
     def destroy(self, request, *args, **kwargs):
         """Override destroy to return custom response format."""
         instance = self.get_object()
@@ -130,6 +136,7 @@ class StaffsProfileViewSet(mixins.ListModelMixin,
             return StaffProfileSerializer
         return StaffListSerializer
 
+    @permissions_required([PERMISSIONS.CAN_VIEW_STAFF_DETAILS])
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset())
         department_id = request.query_params.get('department_id')
@@ -143,6 +150,7 @@ class StaffsProfileViewSet(mixins.ListModelMixin,
         )
         return response
 
+    @permissions_required([PERMISSIONS.CAN_VIEW_STAFF_DETAILS])
     def retrieve(self, request, pk = None):
         instance = self.get_object()
         serializer = self.get_serializer(instance, context={'request': request})
@@ -152,6 +160,7 @@ class StaffsProfileViewSet(mixins.ListModelMixin,
             data=serializer.data,
             status_code=status.HTTP_200_OK
         )
+    @permissions_required([PERMISSIONS.CAN_UPDATE_STAFF])
     def patch(self, request):
         """Update current user's profile."""
         serializer = StaffProfileUpdateSerializer(

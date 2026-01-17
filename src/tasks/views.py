@@ -11,6 +11,8 @@ from tasks.serializers import (
     TaskStatusUpdateSerializer,
     TaskAdminUpdateSerializer,
 )
+from console.permissions import permissions_required
+from utils.permissions import PERMISSIONS
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -45,6 +47,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         
         return queryset
 
+    @permissions_required([PERMISSIONS.CAN_VIEW_TASKS])
     def list(self, request, *args, **kwargs):
         """List all tasks with custom response format."""
         queryset = self.filter_queryset(self.get_queryset())
@@ -62,6 +65,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
+    @permissions_required([PERMISSIONS.CAN_VIEW_TASKS])
     def retrieve(self, request, *args, **kwargs):
         """Retrieve a single task with custom response format."""
         instance = self.get_object()
@@ -73,6 +77,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
+    @permissions_required([PERMISSIONS.CAN_ASSIGN_TASKS])
     def create(self, request, *args, **kwargs):
         """Create a new task with custom response format."""
         serializer = self.get_serializer(data=request.data)
@@ -95,6 +100,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_201_CREATED
         )
 
+    @permissions_required([PERMISSIONS.CAN_ASSIGN_TASKS])
     def update(self, request, *args, **kwargs):
         """
         Update a task with custom response format.
@@ -140,6 +146,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
+    @permissions_required([PERMISSIONS.CAN_ASSIGN_TASKS])
     def destroy(self, request, *args, **kwargs):
         """Delete a task - Admin only."""
         user = request.user
