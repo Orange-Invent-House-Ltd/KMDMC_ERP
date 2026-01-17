@@ -33,7 +33,6 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     ordering = ['name']
     serializer_class = DepartmentSerializer
 
-    @permissions_required([PERMISSIONS.CAN_VIEW_DEPARTMENTS])
     def list(self, request, *args, **kwargs):
         """Override list to return custom response format."""
         queryset = self.filter_queryset(self.get_queryset())
@@ -51,7 +50,6 @@ class DepartmentViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
-    @permissions_required([PERMISSIONS.CAN_VIEW_DEPARTMENTS])
     def retrieve(self, request, *args, **kwargs):
         """Override retrieve to return custom response format."""
         instance = self.get_object()
