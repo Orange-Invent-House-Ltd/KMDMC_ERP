@@ -143,6 +143,14 @@ class CustomUser(AbstractUser):
             import random
             self.employee_id = f"{prefix}-{random.randint(1000, 9999)}"
         return self.employee_id
+    
+    def has_permissions(self, permission_names):
+        """Check if user has all specified permissions."""
+        if not self.role:
+            return False
+        return self.role.permissions.filter(name__in=permission_names).count() == len(
+            permission_names
+        )
 
 
 class StaffActivity(models.Model):
