@@ -2,6 +2,7 @@ from django.utils import timezone
 from django_filters import rest_framework as django_filters
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 
@@ -126,7 +127,7 @@ class PermissionViewSet(viewsets.ModelViewSet):
 class RoleViewSet(viewsets.ModelViewSet):
     queryset = Role.objects.all().order_by("name", "-created_at")
     serializer_class = RoleSerializer
-    permission_classes = [IsSuperAdmin]
+    permission_classes = [AllowAny]
     pagination_class = CustomPagination
     filter_backends = [django_filters.DjangoFilterBackend, filters.SearchFilter]
     search_fields = ["name", "description"]
@@ -138,7 +139,7 @@ class RoleViewSet(viewsets.ModelViewSet):
             200: RoleSerializer,
         },
     )
-    @permissions_required([PERMISSIONS.CAN_VIEW_ROLES])
+    
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset())
         qs = self.paginate_queryset(queryset)
@@ -153,7 +154,7 @@ class RoleViewSet(viewsets.ModelViewSet):
         operation_description="Retrieve a role",
         responses={200: RoleSerializer},
     )
-    @permissions_required([PERMISSIONS.CAN_VIEW_ROLES])
+    
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
