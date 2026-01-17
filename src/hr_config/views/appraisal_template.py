@@ -22,7 +22,7 @@ class AppraisalTemplateViewSet(viewsets.ModelViewSet):
     Only HR admins/superadmins can manage templates.
     """
     queryset = AppraisalTemplate.objects.select_related('created_by').all()
-    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    permission_classes = [IsAuthenticated]
     pagination_class = CustomPagination
 
     filter_backends = [
@@ -146,7 +146,7 @@ class AppraisalTemplateViewSet(viewsets.ModelViewSet):
         instance.status = 'archived'
         instance.save()
 
-        serializer = AppraisalTemplateDetailSerializer(instance)
+        # serializer = AppraisalTemplateDetailSerializer(instance)
         return Response(
             success=True,
             message="Appraisal template archived successfully",
@@ -160,11 +160,10 @@ class AppraisalTemplateViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         instance.status = 'active'
         instance.save()
-
-        serializer = AppraisalTemplateDetailSerializer(instance)
+        # serializer = AppraisalTemplateDetailSerializer(instance)
         return Response(
             success=True,
             message="Appraisal template activated successfully",
-            data=serializer.data,
+            # data=serializer.data,
             status_code=status.HTTP_200_OK
         )
