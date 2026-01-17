@@ -11,6 +11,7 @@ class PermissionModule(Enum):
     HR = "HR"
     EXECUTIVE = "EXECUTIVE"
     TASKS = "TASKS"
+    HR_CONFIG = "HR_CONFIG"
 
     @classmethod
     def choices(cls):

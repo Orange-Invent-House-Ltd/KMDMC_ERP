@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "audit",
     "tasks",
     "common",
+    "hr_config",
 ]
 
 MIDDLEWARE = [
@@ -95,7 +96,7 @@ db_port = os.getenv("POSTGRES_PORT")
 
 # Use PostgreSQL if all env vars are set, otherwise fallback to SQLite
 db_uri = f"postgres://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
-db_uri = os.getenv("DATABASE_URL")
+# db_uri = os.getenv("DATABASE_URL")
 DATABASES = {"default": dj_database_url.parse(db_uri, conn_max_age=600)}
 
 
@@ -183,7 +184,7 @@ SWAGGER_SETTINGS = {
 
 # Simple JWT settings
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
