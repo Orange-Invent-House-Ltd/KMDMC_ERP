@@ -61,7 +61,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
-    @permissions_required([PERMISSIONS.CAN_ADD_DEPARTMENT])
+    # @permissions_required([PERMISSIONS.CAN_ADD_DEPARTMENT])
     def create(self, request, *args, **kwargs):
         """Override create to return custom response format."""
         serializer = self.get_serializer(data=request.data)

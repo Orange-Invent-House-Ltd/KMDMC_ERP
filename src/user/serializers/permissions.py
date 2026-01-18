@@ -20,6 +20,7 @@ class PermissionMinimalSerializer(serializers.ModelSerializer):
 
 
 class RoleSerializer(serializers.ModelSerializer):
+    
     permissions = serializers.PrimaryKeyRelatedField(
         queryset=Permission.objects.all(), many=True, required=False, write_only=True
     )
@@ -65,7 +66,7 @@ class RoleSerializer(serializers.ModelSerializer):
         modules = set()
         for permission in obj.permissions.all():
             modules.add(permission.module)
-        return list(modules.intersection(set(ADMIN_SIDEBAR_MODULES)))
+        return list(modules.union(set(ADMIN_SIDEBAR_MODULES)))
 
 
 class RoleMinimalSerializer(serializers.ModelSerializer):
