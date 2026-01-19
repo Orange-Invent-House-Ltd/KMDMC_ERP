@@ -28,6 +28,8 @@ class TaskSerializer(serializers.ModelSerializer):
 
 class TaskCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating tasks."""
+    assigned_to = serializers.CharField(source='assigned_to.name', read_only=True)
+    assigned_by = serializers.CharField(source='assigned_by.name', read_only=True)
 
     class Meta:
         model = Task
@@ -36,6 +38,7 @@ class TaskCreateSerializer(serializers.ModelSerializer):
             'title',
             'description',
             'assigned_to',
+            'assigned_by',
             'priority',
             'status',
             'deadline',
