@@ -20,7 +20,7 @@ APP_ENV = "🚀 Production" if ENVIRONMENT == "production" else "🚧 Staging"
 ADMIN_SIDEBAR_MODULES = [
     "DASHBOARD",
     "HR_SETTINGS",
-    "TASK",
+    "TASKS",
     "CORRESPONDENCE",
     "APPROVALS",
     "PERFORMANCE_OVERVIEW",
