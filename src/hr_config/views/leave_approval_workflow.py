@@ -16,8 +16,6 @@ from hr_config.serializers import (
     LeaveApprovalWorkflowUpdateSerializer,
     LeaveApprovalStageCreateSerializer,
 )
-from console.permissions import permissions_required
-from utils.permissions import PERMISSIONS
 
 
 class LeaveApprovalWorkflowViewSet(viewsets.ModelViewSet):
@@ -50,7 +48,6 @@ class LeaveApprovalWorkflowViewSet(viewsets.ModelViewSet):
             return LeaveApprovalWorkflowUpdateSerializer
         return LeaveApprovalWorkflowListSerializer
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     def list(self, request, *args, **kwargs):
         """List all leave approval workflows."""
         queryset = self.filter_queryset(self.get_queryset())
@@ -68,7 +65,6 @@ class LeaveApprovalWorkflowViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     def retrieve(self, request, *args, **kwargs):
         """Retrieve single workflow with all stages."""
         instance = self.get_object()
@@ -80,7 +76,6 @@ class LeaveApprovalWorkflowViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     @transaction.atomic
     def create(self, request, *args, **kwargs):
         """Create new workflow with nested stages."""
@@ -108,7 +103,6 @@ class LeaveApprovalWorkflowViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_201_CREATED
         )
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     def update(self, request, *args, **kwargs):
         """Update workflow (does not update stages)."""
         partial = kwargs.pop('partial', False)
@@ -136,7 +130,6 @@ class LeaveApprovalWorkflowViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     def destroy(self, request, *args, **kwargs):
         """Delete workflow."""
         instance = self.get_object()
@@ -158,7 +151,6 @@ class LeaveApprovalWorkflowViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     @action(detail=True, methods=['post'])
     @transaction.atomic
     def activate(self, request, pk=None):
@@ -183,7 +175,6 @@ class LeaveApprovalWorkflowViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     @action(detail=True, methods=['post'])
     def add_stage(self, request, pk=None):
         """Add a new stage to the workflow."""
@@ -219,7 +210,6 @@ class LeaveApprovalWorkflowViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_201_CREATED
         )
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     @action(detail=False, methods=['get'])
     def active(self, request):
         """Get the currently active workflow."""
