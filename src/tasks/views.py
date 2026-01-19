@@ -96,7 +96,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_201_CREATED
         )
 
-    @permissions_required([PERMISSIONS.CAN_ASSIGN_TASKS])
+    @permissions_required([PERMISSIONS.CAN_UPDATE_TASK])
     def update(self, request, *args, **kwargs):
         """
         Update a task with custom response format.
