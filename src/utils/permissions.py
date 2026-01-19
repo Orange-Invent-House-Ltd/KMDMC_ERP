@@ -22,7 +22,6 @@ class PERMISSIONS:
     # MD ROLES
     CAN_ARCHIVE_CORRESPONDENCE = "CAN_ARCHIVE_CORRESPONDENCE"
     CAN_GIVE_FINAL_APPROVAL = "CAN_GIVE_FINAL_APPROVAL"
-    CAN_DELETE_DEPARTMENT = "CAN_DELETE_DEPARTMENT"
     CAN_DELEGATE_AUTHORITY = "CAN_DELEGATE_AUTHORITY"
 
     # DASHBOARD
@@ -144,7 +143,7 @@ SYSTEM_PERMISSIONS = {
 
     PERMISSIONS.CAN_DELETE_DEPARTMENT: {
         "description": "Can delete existing departments",
-        "module": PermissionModule.HR_SETTINGS.value,
+        "module": PermissionModule.DEPARTMENTS.value,
     },
     PERMISSIONS.CAN_DELEGATE_AUTHORITY: {
         "description": "Can delegate authority on a time-bound basis",
