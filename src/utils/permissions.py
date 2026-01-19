@@ -25,6 +25,15 @@ class PERMISSIONS:
     CAN_DELETE_DEPARTMENT = "CAN_DELETE_DEPARTMENT"
     CAN_DELEGATE_AUTHORITY = "CAN_DELEGATE_AUTHORITY"
 
+    # DASHBOARD
+    CAN_VIEW_DASHBOARD = "CAN_VIEW_DASHBOARD"
+
+    # Departments
+    CAN_CREATE_DEPARTMENT = "CAN_CREATE_DEPARTMENT"
+    CAN_UPDATE_DEPARTMENT = "CAN_UPDATE_DEPARTMENT"
+    CAN_DELETE_DEPARTMENT = "CAN_DELETE_DEPARTMENT"
+    CAN_VIEW_DEPARTMENTS = "CAN_VIEW_DEPARTMENTS"
+
     # CORRESPONDENCE
     CAN_VIEW_CORRESPONDENCE = "CAN_VIEW_CORRESPONDENCE"
     CAN_CREATE_CORRESPONDENCE = "CAN_CREATE_CORRESPONDENCE"
@@ -36,6 +45,7 @@ class PERMISSIONS:
     CAN_VIEW_DEPARTMENTS = "CAN_VIEW_DEPARTMENTS"
     CAN_ADD_DEPARTMENT = "CAN_ADD_DEPARTMENT"
     CAN_UPDATE_DEPARTMENT = "CAN_UPDATE_DEPARTMENT"
+    CAN_VIEW_PERFORMANCE_OVERVIEW = "CAN_VIEW_PERFORMANCE_OVERVIEW"
     
 
     # STAFF
@@ -62,40 +72,46 @@ SYSTEM_PERMISSIONS = {
     # SUPER_ADMIN PERMISSIONS
     PERMISSIONS.CAN_VIEW_PERMISSIONS: {
         "description": "Can view all permissions in the system",
-        "module": PermissionModule.SIDEBAR.value,
+        "module": PermissionModule.SYSTEM_CONFIG.value,
     },
     PERMISSIONS.CAN_ACCESS_SYSTEM_ADMIN: {
         "description": "Can access system admin and technical settings",
-        "module": PermissionModule.SIDEBAR.value,
+        "module": PermissionModule.SYSTEM_CONFIG.value,
     },
     PERMISSIONS.CAN_ADD_PERMISSIONS_TO_ROLE: {
         "description": "Can add permissions to roles",
-        "module": PermissionModule.SIDEBAR.value,
+        "module": PermissionModule.ROLES.value,
     },
     PERMISSIONS.CAN_UPDATE_PERMISSIONS: {
         "description": "Can update existing permissions",
-        "module": PermissionModule.SIDEBAR.value,
+        "module": PermissionModule.ROLES.value,
     },
     PERMISSIONS.CAN_DELETE_PERMISSIONS: {
         "description": "Can delete permissions from the system",
-        "module": PermissionModule.SIDEBAR.value,
+        "module": PermissionModule.SYSTEM_CONFIG.value,
     },
     PERMISSIONS.CAN_ADD_ROLES: {
         "description": "Can create new roles",
-        "module": PermissionModule.SIDEBAR.value,
+        "module": PermissionModule.ROLES.value,
     },
     PERMISSIONS.CAN_UPDATE_ROLES: {
         "description": "Can update existing roles",
-        "module": PermissionModule.SIDEBAR.value,
+        "module": PermissionModule.ROLES.value,
     },
     PERMISSIONS.CAN_DELETE_ROLES: {
         "description": "Can delete roles from the system",
-        "module": PermissionModule.SIDEBAR.value,
+        "module": PermissionModule.ROLES.value,
     },
 
     PERMISSIONS.CAN_VIEW_ROLES: {
         "description": "Can view all roles in the system",
-        "module": PermissionModule.SIDEBAR.value,
+        "module": PermissionModule.ROLES.value,
+    },
+
+    # PERFORMANCE OVERVIEW
+    PERMISSIONS.CAN_VIEW_PERFORMANCE_OVERVIEW: {
+        "description": "Can view performance overview reports",
+        "module": PermissionModule.PERFORMANCE_OVERVIEW.value,
     },
 
 
@@ -118,21 +134,21 @@ SYSTEM_PERMISSIONS = {
     # MD ROLES
     PERMISSIONS.CAN_ARCHIVE_CORRESPONDENCE: {
         "description": "Can archive correspondence",
-        "module": PermissionModule.SIDEBAR.value,
+        "module": PermissionModule.CORRESPONDENCE.value,
     },
 
     PERMISSIONS.CAN_GIVE_FINAL_APPROVAL: {
         "description": "Can give final approval and issue directives",
-        "module": PermissionModule.SIDEBAR.value,
+        "module": PermissionModule.APPROVALS.value,
     },
 
-        PERMISSIONS.CAN_DELETE_DEPARTMENT: {
+    PERMISSIONS.CAN_DELETE_DEPARTMENT: {
         "description": "Can delete existing departments",
-        "module": PermissionModule.SIDEBAR.value,
+        "module": PermissionModule.HR_SETTINGS.value,
     },
     PERMISSIONS.CAN_DELEGATE_AUTHORITY: {
         "description": "Can delegate authority on a time-bound basis",
-        "module": PermissionModule.SIDEBAR.value,
+        "module": PermissionModule.APPROVALS.value,
     },
 
     # TASK MANAGEMENT
@@ -145,6 +161,11 @@ SYSTEM_PERMISSIONS = {
         "description": "Can execute assigned tasks",
         "module": PermissionModule.TASKS.value,
     },
+    PERMISSIONS.CAN_VIEW_TASKS: {
+        "description": "Can view all tasks and their statuses",
+        "module": PermissionModule.TASKS.value,
+    },
+
 
     # STAFF / HR
     PERMISSIONS.CAN_VIEW_STAFF_DETAILS: {
@@ -157,6 +178,11 @@ SYSTEM_PERMISSIONS = {
         "module": PermissionModule.HR_SETTINGS.value,
     },
 
+    PERMISSIONS.CAN_VIEW_DASHBOARD: {
+        "description": "Can view staff information",
+        "module": PermissionModule.DASHBOARD.value,
+    },
+
     PERMISSIONS.CAN_UPDATE_STAFF: {
         "description": "Can update existing staff information",
         "module": PermissionModule.HR_SETTINGS.value,
@@ -164,17 +190,17 @@ SYSTEM_PERMISSIONS = {
 
     PERMISSIONS.CAN_ADD_DEPARTMENT: {
         "description": "Can add new departments",
-        "module": PermissionModule.HR_SETTINGS.value,
+        "module": PermissionModule.DEPARTMENTS.value,
     },
 
     PERMISSIONS.CAN_VIEW_DEPARTMENTS: {
         "description": "Can view all departments",
-        "module": PermissionModule.HR_SETTINGS.value,
+        "module": PermissionModule.DEPARTMENTS.value,
     },
 
     PERMISSIONS.CAN_UPDATE_DEPARTMENT: {
         "description": "Can update existing department details",
-        "module": PermissionModule.HR_SETTINGS.value,
+        "module": PermissionModule.DEPARTMENTS.value,
     },
 
 }
