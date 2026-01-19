@@ -52,7 +52,6 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
             'created_at',
             'archived_at',
             "sender",
-            "receiver",
             "image_urls"
         ]
 
