@@ -27,10 +27,6 @@ class TaskViewSet(viewsets.ModelViewSet):
         if self.action == 'create':
             return TaskCreateSerializer
         elif self.action in ['update', 'partial_update']:
-            # Check if user is admin
-            user = self.request.user
-            if user.is_authenticated and (user.is_admin or user.is_superuser or user.is_staff):
-                return TaskAdminUpdateSerializer
             return TaskStatusUpdateSerializer
         return TaskSerializer
 
@@ -110,22 +106,6 @@ class TaskViewSet(viewsets.ModelViewSet):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         
-        user = request.user
-        is_admin = user.is_authenticated and (user.is_admin or user.is_superuser or user.is_staff)
-        
-        # If non-admin trying to update fields other than status
-        if not is_admin:
-            allowed_fields = {'status'}
-            submitted_fields = set(request.data.keys())
-            disallowed_fields = submitted_fields - allowed_fields
-            
-            if disallowed_fields:
-                return Response(
-                    success=False,
-                    message=f"You can only update the 'status' field. Admin access required for: {', '.join(disallowed_fields)}",
-                    status_code=status.HTTP_403_FORBIDDEN
-                )
-        
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if not serializer.is_valid():
             return Response(
@@ -149,15 +129,15 @@ class TaskViewSet(viewsets.ModelViewSet):
     @permissions_required([PERMISSIONS.CAN_ASSIGN_TASKS])
     def destroy(self, request, *args, **kwargs):
         """Delete a task - Admin only."""
-        user = request.user
-        is_admin = user.is_authenticated and (user.is_admin or user.is_superuser or user.is_staff)
+        # user = request.user
+        # is_admin = user.is_authenticated and (user.is_admin or user.is_superuser or user.is_staff)
         
-        if not is_admin:
-            return Response(
-                success=False,
-                message="Only admins can delete tasks",
-                status_code=status.HTTP_403_FORBIDDEN
-            )
+        # if not is_admin:
+        #     return Response(
+        #         success=False,
+        #         message="Only admins can delete tasks",
+        #         status_code=status.HTTP_403_FORBIDDEN
+        #     )
         
         instance = self.get_object()
         instance.delete()
