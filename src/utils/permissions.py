@@ -60,6 +60,7 @@ class PERMISSIONS:
     CAN_ASSIGN_TASKS = "CAN_ASSIGN_TASKS"
     CAN_EXECUTE_TASKS = "CAN_EXECUTE_TASKS"
     CAN_VIEW_TASKS = "CAN_VIEW_TASKS"
+    CAN_UPDATE_TASK = "CAN_UPDATE_TASK"
 
 
     # SYSTEM / IT
@@ -162,6 +163,11 @@ SYSTEM_PERMISSIONS = {
     },
     PERMISSIONS.CAN_VIEW_TASKS: {
         "description": "Can view all tasks and their statuses",
+        "module": PermissionModule.TASKS.value,
+    },
+
+    PERMISSIONS.CAN_UPDATE_TASK: {
+        "description": "Can update task details and progress",
         "module": PermissionModule.TASKS.value,
     },
 
