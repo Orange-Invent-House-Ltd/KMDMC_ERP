@@ -14,8 +14,7 @@ from hr_config.serializers import (
     PublicHolidayCreateSerializer,
     PublicHolidayUpdateSerializer,
 )
-from console.permissions import permissions_required
-from utils.permissions import PERMISSIONS
+
 
 class PublicHolidayViewSet(viewsets.ModelViewSet):
     """
@@ -53,7 +52,6 @@ class PublicHolidayViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated(), IsSuperAdmin()]
         return [IsAuthenticated()]
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     def list(self, request, *args, **kwargs):
         """List all public holidays."""
         queryset = self.filter_queryset(self.get_queryset())
@@ -71,7 +69,6 @@ class PublicHolidayViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     def retrieve(self, request, *args, **kwargs):
         """Retrieve single public holiday."""
         instance = self.get_object()
@@ -83,7 +80,6 @@ class PublicHolidayViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     def create(self, request, *args, **kwargs):
         """Create new public holiday."""
         serializer = self.get_serializer(data=request.data)
@@ -108,7 +104,6 @@ class PublicHolidayViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_201_CREATED
         )
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     def update(self, request, *args, **kwargs):
         """Update public holiday."""
         partial = kwargs.pop('partial', False)
@@ -136,7 +131,6 @@ class PublicHolidayViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     def destroy(self, request, *args, **kwargs):
         """Delete public holiday."""
         instance = self.get_object()
@@ -149,7 +143,6 @@ class PublicHolidayViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     @action(detail=False, methods=['get'])
     def by_year(self, request):
         """Get holidays by specific year."""
