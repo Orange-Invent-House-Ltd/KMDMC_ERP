@@ -103,7 +103,7 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
                 errors=serializer.errors,
                 status_code=status.HTTP_400_BAD_REQUEST
             )
-        serializer.save(created_by=request.user)
+        serializer.save(sender=request.user)
         return Response(
             success=True,
             message="Correspondence created successfully",
