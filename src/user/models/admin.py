@@ -5,13 +5,12 @@ from django.db import models
 
 class PermissionModule(Enum):
     SIDEBAR = "SIDEBAR"
-    OVERVIEW = "OVERVIEW"
-    SETTINGS = "SETTINGS"
+    # OVERVIEW = "OVERVIEW"
+    # SETTINGS = "SETTINGS"
     CORRESPONDENCE = "CORRESPONDENCE"
-    HR = "HR"
-    EXECUTIVE = "EXECUTIVE"
+    # EXECUTIVE = "EXECUTIVE"
     TASKS = "TASKS"
-    HR_CONFIG = "HR_CONFIG"
+    HR_SETTINGS = "HR_SETTINGS"
 
 
     @classmethod
