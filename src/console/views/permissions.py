@@ -20,7 +20,7 @@ class PermissionViewSet(viewsets.ModelViewSet):
     queryset = Permission.objects.all().order_by("module", "name", "-created_at")
     serializer_class = PermissionSerializer
     allowed_methods = ["get", "post", "patch", "delete"]
-    #permission_classes = [IsSuperAdmin]
+    permission_classes = [AllowAny]
     pagination_class = CustomPagination
     filter_backends = [django_filters.DjangoFilterBackend, filters.SearchFilter]
     search_fields = ["name", "description", "module"]
