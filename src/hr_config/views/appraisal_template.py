@@ -14,8 +14,7 @@ from hr_config.serializers import (
     AppraisalTemplateCreateSerializer,
     AppraisalTemplateUpdateSerializer,
 )
-from console.permissions import permissions_required
-from utils.permissions import PERMISSIONS
+
 
 
 class AppraisalTemplateViewSet(viewsets.ModelViewSet):
