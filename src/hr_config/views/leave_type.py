@@ -13,8 +13,6 @@ from hr_config.serializers import (
     LeaveTypeCreateSerializer,
     LeaveTypeUpdateSerializer,
 )
-from console.permissions import permissions_required
-from utils.permissions import PERMISSIONS
 
 class LeaveTypeViewSet(viewsets.ModelViewSet):
     """
@@ -52,7 +50,6 @@ class LeaveTypeViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated(), IsSuperAdmin()]
         return [IsAuthenticated()]
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     def list(self, request, *args, **kwargs):
         """List all leave types."""
         queryset = self.filter_queryset(self.get_queryset())
@@ -70,7 +67,6 @@ class LeaveTypeViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     def retrieve(self, request, *args, **kwargs):
         """Retrieve single leave type."""
         instance = self.get_object()
@@ -82,7 +78,6 @@ class LeaveTypeViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     def create(self, request, *args, **kwargs):
         """Create new leave type."""
         serializer = self.get_serializer(data=request.data)
@@ -107,7 +102,6 @@ class LeaveTypeViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_201_CREATED
         )
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     def update(self, request, *args, **kwargs):
         """Update leave type."""
         partial = kwargs.pop('partial', False)
@@ -135,7 +129,6 @@ class LeaveTypeViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
-    @permissions_required([PERMISSIONS.CAN_ACCESS_HR_CONFIG])
     def destroy(self, request, *args, **kwargs):
         """Delete leave type."""
         instance = self.get_object()
