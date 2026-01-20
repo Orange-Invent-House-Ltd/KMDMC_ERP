@@ -27,10 +27,6 @@ class TaskViewSet(viewsets.ModelViewSet):
         if self.action == 'create':
             return TaskCreateSerializer
         elif self.action in ['update', 'partial_update']:
-            # Check if user is admin
-            user = self.request.user
-            if user.is_authenticated and (user.is_admin or user.is_superuser or user.is_staff):
-                return TaskAdminUpdateSerializer
             return TaskStatusUpdateSerializer
         return TaskSerializer
 
@@ -47,7 +43,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         
         return queryset
 
-    # @permissions_required([PERMISSIONS.CAN_VIEW_TASKS])
+    @permissions_required([PERMISSIONS.CAN_VIEW_TASKS])
     def list(self, request, *args, **kwargs):
         """List all tasks with custom response format."""
         queryset = self.filter_queryset(self.get_queryset())
@@ -65,7 +61,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
-    # @permissions_required([PERMISSIONS.CAN_VIEW_TASKS])
+    @permissions_required([PERMISSIONS.CAN_VIEW_TASKS])
     def retrieve(self, request, *args, **kwargs):
         """Retrieve a single task with custom response format."""
         instance = self.get_object()
@@ -77,7 +73,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
-    # @permissions_required([PERMISSIONS.CAN_ASSIGN_TASKS])
+    @permissions_required([PERMISSIONS.CAN_ASSIGN_TASKS])
     def create(self, request, *args, **kwargs):
         """Create a new task with custom response format."""
         serializer = self.get_serializer(data=request.data)
@@ -100,7 +96,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_201_CREATED
         )
 
-    # @permissions_required([PERMISSIONS.CAN_ASSIGN_TASKS])
+    @permissions_required([PERMISSIONS.CAN_UPDATE_TASK])
     def update(self, request, *args, **kwargs):
         """
         Update a task with custom response format.
@@ -109,22 +105,6 @@ class TaskViewSet(viewsets.ModelViewSet):
         """
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        
-        user = request.user
-        is_admin = user.is_authenticated and (user.is_admin or user.is_superuser or user.is_staff)
-        
-        # If non-admin trying to update fields other than status
-        if not is_admin:
-            allowed_fields = {'status'}
-            submitted_fields = set(request.data.keys())
-            disallowed_fields = submitted_fields - allowed_fields
-            
-            if disallowed_fields:
-                return Response(
-                    success=False,
-                    message=f"You can only update the 'status' field. Admin access required for: {', '.join(disallowed_fields)}",
-                    status_code=status.HTTP_403_FORBIDDEN
-                )
         
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if not serializer.is_valid():
@@ -149,15 +129,15 @@ class TaskViewSet(viewsets.ModelViewSet):
     @permissions_required([PERMISSIONS.CAN_ASSIGN_TASKS])
     def destroy(self, request, *args, **kwargs):
         """Delete a task - Admin only."""
-        user = request.user
-        is_admin = user.is_authenticated and (user.is_admin or user.is_superuser or user.is_staff)
+        # user = request.user
+        # is_admin = user.is_authenticated and (user.is_admin or user.is_superuser or user.is_staff)
         
-        if not is_admin:
-            return Response(
-                success=False,
-                message="Only admins can delete tasks",
-                status_code=status.HTTP_403_FORBIDDEN
-            )
+        # if not is_admin:
+        #     return Response(
+        #         success=False,
+        #         message="Only admins can delete tasks",
+        #         status_code=status.HTTP_403_FORBIDDEN
+        #     )
         
         instance = self.get_object()
         instance.delete()

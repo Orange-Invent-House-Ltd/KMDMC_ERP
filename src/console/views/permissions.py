@@ -32,7 +32,7 @@ class PermissionViewSet(viewsets.ModelViewSet):
             200: PermissionSerializer,
         },
     )
-    @permissions_required([PERMISSIONS.CAN_VIEW_PERMISSIONS])
+    
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset())
         qs = self.paginate_queryset(queryset)
