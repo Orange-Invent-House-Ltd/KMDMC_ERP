@@ -20,4 +20,5 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ubuntu/KMDMC_ERP
+            chmod +x ./deploy/deploy.sh
             ./deploy/deploy.sh

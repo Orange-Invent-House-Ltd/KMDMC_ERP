@@ -47,6 +47,16 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id"]
 
+class PerformanceOverviewSerializer(serializers.Serializer):
+    """Serializer for performance overview data."""
+    name = serializers.CharField(source="user.name", read_only=True)
+    pending_approvals = serializers.IntegerField(help_text="Number of pending approvals")
+    department = serializers.CharField(source="user.department.name", read_only=True)
+    active_tasks = serializers.IntegerField(source="active_tasks", help_text="Number of active tasks")
+    # completed_tasks = serializers.IntegerField(help_text="Number of completed tasks")
+    # pending_approvals = serializers.IntegerField(help_text="Number of pending approvals")
+
+
 
 class LogoutSerializer(serializers.Serializer):
     """Serializer for logout request."""
