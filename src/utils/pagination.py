@@ -12,7 +12,7 @@ class CustomPagination(PageNumberPagination):
     def get_paginated_response(self, data):
         return Response(
             success=True,
-            message=self.message if self.message else "Results retrieved successfully",
+            message="Results retrieved successfully",
             status_code=status.HTTP_200_OK,
             data=data,
             meta={

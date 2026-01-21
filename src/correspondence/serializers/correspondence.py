@@ -32,6 +32,7 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
     is_overdue = serializers.SerializerMethodField()
     sender = serializers.CharField(source='sender.name', read_only=True)
     receiver = serializers.CharField(source='receiver.name', read_only=True)
+    through = serializers.CharField(source='through.name', read_only=True)
 
     class Meta:
         model = Correspondence
@@ -51,7 +52,6 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
             'created_at',
             'archived_at',
             "sender",
-            "receiver",
             "image_urls"
         ]
 
@@ -68,6 +68,7 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
         child=serializers.URLField(),
         required=False
     )
+    through = serializers.CharField(source='through.name', read_only=True)
 
     class Meta:
         model = Correspondence

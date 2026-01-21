@@ -20,13 +20,13 @@ SECRET_KEY = "django-insecure-w$)9#3&+m0xblll(t_er%j&jzio=yitz1d2bk6v*%*lake*39@
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
-
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "kmdmc-erp.onrender.com",
-    ".onrender.com",  # Allow all Render subdomains
-]
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").replace(" ", "").split(",")
+# ALLOWED_HOSTS = [
+#     "localhost",
+#     "127.0.0.1",
+#     "kmdmc-erp.onrender.com",
+#     ".onrender.com",  # Allow all Render subdomains
+# ]
 
 
 # Application definition
@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "audit",
     "tasks",
     "common",
+    "hr_config",
 ]
 
 MIDDLEWARE = [
@@ -96,7 +97,7 @@ db_user = os.getenv("POSTGRES_USER")
 db_port = os.getenv("POSTGRES_PORT")
 
 # Use PostgreSQL if all env vars are set, otherwise fallback to SQLite
-db_uri = f"postgres://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+# db_uri = f"postgres://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
 db_uri = os.getenv("DATABASE_URL")
 DATABASES = {"default": dj_database_url.parse(db_uri, conn_max_age=600)}
 
@@ -190,7 +191,7 @@ SWAGGER_SETTINGS = {
 
 # Simple JWT settings
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,

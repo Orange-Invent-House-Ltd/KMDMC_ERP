@@ -2,14 +2,15 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
 
-from .models.models import CustomUser, Department, StaffActivity, PerformanceRecord
+from .models.models import CustomUser, Department, StaffActivity, PerformanceRecord, Role
+from .models.admin import Permission
 
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
     list_display = ['name', 'head', 'is_active', 'staff_count']
     list_filter = ['is_active']
-    search_fields = ['name', 'code', 'description']
+    search_fields = ['name', 'description']
     ordering = ['name']
     raw_id_fields = ['head']
 
@@ -21,19 +22,18 @@ class DepartmentAdmin(admin.ModelAdmin):
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
-    list_display = ['email', 'name', 'employee_id', 'role', 'is_verified', 'is_active', 'created_at']
-    list_filter = ['role', 'location', 'is_verified', 'is_active', 'is_staff']
+    list_display = ['email', 'name', 'employee_id', 'is_verified', 'is_active', 'created_at']
+    list_filter = ['location', 'is_verified', 'is_active', 'is_staff']
     search_fields = ['email', 'name', 'phone', 'employee_id']
     ordering = ['-created_at']
     
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Personal Info', {'fields': ('name', 'phone', 'date_of_birth', 'profile_photo', 'bio')}),
-        ('Staff Profile', {'fields': ('employee_id', 'department', 'location', 'date_joined_org', 'reports_to')}),
-        ('Contact', {'fields': ('office_phone', 'office_extension')}),
+        ('Staff Profile', {'fields': ('employee_id', 'department', 'location', 'date_joined_org')}),
+        ('Contact', {'fields': ('office_phone',)}),
         ('Performance', {'fields': ('performance_score', 'performance_points')}),
         ('Role & Permissions', {'fields': ('role', 'is_verified', 'is_active', 'is_staff', 'is_superuser')}),
-        ('Notifications', {'fields': ('send_email_notifications', 'send_app_notifications', 'send_sms_notifications')}),
         ('Important dates', {'fields': ('last_login', 'created_at', 'updated_at')}),
     )
     
@@ -83,3 +83,5 @@ class PerformanceRecordAdmin(admin.ModelAdmin):
     completion_rate.short_description = 'Completion Rate'
 
 
+admin.site.register(Role)
+admin.site.register(Permission)

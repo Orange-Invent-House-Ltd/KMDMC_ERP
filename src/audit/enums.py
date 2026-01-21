@@ -30,7 +30,8 @@ class AuditStatusEnum(CustomEnum):
 class AuditModuleEnum(CustomEnum):
     AUTH = "auth", "Authentication"
     USER = "user", "User Management"
-    AUDIT = "audit", "Audit Trail" 
+    AUDIT = "audit", "Audit Trail"
+    HR_CONFIG = "hr_config", "HR Configuration" 
     
 
 class AuditTypeEnum(CustomEnum):
@@ -52,7 +53,34 @@ class AuditTypeEnum(CustomEnum):
     CHANGE_CORRESPONDENCE_STATUS = "change_correspondence_status", "Changed Correspondence Status"
     ARCHIVE_CORRESPONDENCE = "archive_correspondence", "Archived Correspondence"
 
+<<<<<<< HEAD
     
+=======
+    # HR Configuration
+    CREATE_APPRAISAL_TEMPLATE = "create_appraisal_template", "Created Appraisal Template"
+    UPDATE_APPRAISAL_TEMPLATE = "update_appraisal_template", "Updated Appraisal Template"
+    ARCHIVE_APPRAISAL_TEMPLATE = "archive_appraisal_template", "Archived Appraisal Template"
+    DELETE_APPRAISAL_TEMPLATE = "delete_appraisal_template", "Deleted Appraisal Template"
+    CREATE_LEAVE_TYPE = "create_leave_type", "Created Leave Type"
+    UPDATE_LEAVE_TYPE = "update_leave_type", "Updated Leave Type"
+    DELETE_LEAVE_TYPE = "delete_leave_type", "Deleted Leave Type"
+    CREATE_PUBLIC_HOLIDAY = "create_public_holiday", "Created Public Holiday"
+    UPDATE_PUBLIC_HOLIDAY = "update_public_holiday", "Updated Public Holiday"
+    DELETE_PUBLIC_HOLIDAY = "delete_public_holiday", "Deleted Public Holiday"
+    UPDATE_ATTENDANCE_POLICY = "update_attendance_policy", "Updated Attendance Policy"
+    CREATE_LEAVE_WORKFLOW = "create_leave_workflow", "Created Leave Approval Workflow"
+    UPDATE_LEAVE_WORKFLOW = "update_leave_workflow", "Updated Leave Approval Workflow"
+    DELETE_LEAVE_WORKFLOW = "delete_leave_workflow", "Deleted Leave Approval Workflow"
+    ACTIVATE_LEAVE_WORKFLOW = "activate_leave_workflow", "Activated Leave Approval Workflow"
+
+    # Blog
+    ADD_NEW_BLOG = "add_new_blog", "Added New Blog"
+    EDIT_BLOG = "edit_blog", "Edited Blog"
+    SAVE_AS_DRAFT = "save_as_draft", "Saved Blog as Draft"
+    DELETE_BLOG = "delete_blog", "Deleted Blog"
+    PERMANENTLY_DELETE_BLOG = "permanently_delete_blog", "Permanently Deleted Blog"
+    RESTORE_BLOG = "restore_blog", "Restored Blog"
+>>>>>>> 3a280cec74c8fa180c7addcd25c370e23579cb1c
 
     
 

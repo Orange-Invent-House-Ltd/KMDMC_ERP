@@ -5,18 +5,16 @@ from user.serializers.user import UserMinimalSerializer
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    """Full task serializer for reading and admin updates."""
-    assigned_to_details = UserMinimalSerializer(source='assigned_to', read_only=True)
-    assigned_by_details = UserMinimalSerializer(source='assigned_by', read_only=True)
-
+    assigned_to = serializers.CharField(source='assigned_to.name', read_only=True)
+    assigned_by = serializers.CharField(source='assigned_by.name', read_only=True)
     class Meta:
         model = Task
         fields = [
             'id',
             'title',
             'description',
-            'assigned_to_details',
-            'assigned_by_details',
+            'assigned_to',
+            'assigned_by',
             'priority',
             'status',
             'deadline',
@@ -27,7 +25,6 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class TaskCreateSerializer(serializers.ModelSerializer):
-    """Serializer for creating tasks."""
 
     class Meta:
         model = Task
@@ -63,7 +60,15 @@ class TaskStatusUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = ['id', 'status']
+        fields = [
+                    'id',
+                    'title',
+                    'description',
+                    'assigned_to',
+                    'priority',
+                    'status',
+                    'deadline',
+                ]
         read_only_fields = ['id']
 
 
