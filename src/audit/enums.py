@@ -39,7 +39,7 @@ class AuditTypeEnum(CustomEnum):
     ADMIN_LOGIN = "admin_login", "Admin Login"
 
     # User Management
-    INVITE_USER = "invite_user", "Invited User"
+    USER_LOGIN = "user", "User"
     DEACTIVATE_USER = "deactivate_user", "Deactivated User"
     APPROVE_USER = "approve_user", "Approved User"
     RESTRICT_USER = "restrict_user", "Restricted User"
@@ -69,14 +69,6 @@ class AuditTypeEnum(CustomEnum):
     UPDATE_LEAVE_WORKFLOW = "update_leave_workflow", "Updated Leave Approval Workflow"
     DELETE_LEAVE_WORKFLOW = "delete_leave_workflow", "Deleted Leave Approval Workflow"
     ACTIVATE_LEAVE_WORKFLOW = "activate_leave_workflow", "Activated Leave Approval Workflow"
-
-    # Blog
-    ADD_NEW_BLOG = "add_new_blog", "Added New Blog"
-    EDIT_BLOG = "edit_blog", "Edited Blog"
-    SAVE_AS_DRAFT = "save_as_draft", "Saved Blog as Draft"
-    DELETE_BLOG = "delete_blog", "Deleted Blog"
-    PERMANENTLY_DELETE_BLOG = "permanently_delete_blog", "Permanently Deleted Blog"
-    RESTORE_BLOG = "restore_blog", "Restored Blog"
 
     
 

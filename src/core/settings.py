@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django_celery_results',
+    'django_celery_beat',
     # Third-party apps
     "rest_framework",
     "rest_framework_simplejwt",
@@ -99,7 +101,12 @@ db_port = os.getenv("POSTGRES_PORT")
 db_uri = os.getenv("DATABASE_URL")
 DATABASES = {"default": dj_database_url.parse(db_uri, conn_max_age=600)}
 
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
 
+CELERY_RESULT_BACKEND = "django-db"
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
