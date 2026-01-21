@@ -6,6 +6,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from audit.enums import AuditModuleEnum, AuditStatusEnum, AuditTypeEnum, LogParams
 from user.serializers.login import LoginSerializer
 from user.serializers.user import UserMinimalSerializer
+from utils.activity_log import extract_api_request_metadata
+from audit.tasks import log_audit_event_task
 
 
 class LoginView(GenericAPIView):
@@ -39,11 +41,11 @@ class LoginView(GenericAPIView):
             audit_type=AuditTypeEnum.USER_LOGIN.raw_value,
             audit_module=AuditModuleEnum.USER.raw_value,
             status=AuditStatusEnum.SUCCESS.raw_value,
-            user_id=str(request.user.id),
-            user_name=request.user.name.upper(),
-            user_email=request.user.email,
-            user_role=request.user.role,
-            action=f"{request.user.name.upper()} logged in",
+            user_id=str(user.id),
+            user_name=user.name.upper(),
+            user_email=user.email,
+            user_role=user.role.name,
+            action=f"{user.name.upper()} logged in",
             request_meta=extract_api_request_metadata(request),
         )
         log_audit_event_task.delay(event.__dict__)
