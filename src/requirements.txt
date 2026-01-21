@@ -4,6 +4,8 @@ dj_database_url==2.2.0
 Django==5.1.2
 djangorestframework==3.15.2
 djangorestframework_simplejwt==5.3.1
+django_celery_results
+django_celery_beat
 drf_yasg==1.21.8
 python-dotenv==1.2.1
 redis==5.1.1
