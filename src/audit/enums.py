@@ -53,9 +53,6 @@ class AuditTypeEnum(CustomEnum):
     CHANGE_CORRESPONDENCE_STATUS = "change_correspondence_status", "Changed Correspondence Status"
     ARCHIVE_CORRESPONDENCE = "archive_correspondence", "Archived Correspondence"
 
-<<<<<<< HEAD
-    
-=======
     # HR Configuration
     CREATE_APPRAISAL_TEMPLATE = "create_appraisal_template", "Created Appraisal Template"
     UPDATE_APPRAISAL_TEMPLATE = "update_appraisal_template", "Updated Appraisal Template"
@@ -72,15 +69,6 @@ class AuditTypeEnum(CustomEnum):
     UPDATE_LEAVE_WORKFLOW = "update_leave_workflow", "Updated Leave Approval Workflow"
     DELETE_LEAVE_WORKFLOW = "delete_leave_workflow", "Deleted Leave Approval Workflow"
     ACTIVATE_LEAVE_WORKFLOW = "activate_leave_workflow", "Activated Leave Approval Workflow"
-
-    # Blog
-    ADD_NEW_BLOG = "add_new_blog", "Added New Blog"
-    EDIT_BLOG = "edit_blog", "Edited Blog"
-    SAVE_AS_DRAFT = "save_as_draft", "Saved Blog as Draft"
-    DELETE_BLOG = "delete_blog", "Deleted Blog"
-    PERMANENTLY_DELETE_BLOG = "permanently_delete_blog", "Permanently Deleted Blog"
-    RESTORE_BLOG = "restore_blog", "Restored Blog"
->>>>>>> 3a280cec74c8fa180c7addcd25c370e23579cb1c
 
     
 
