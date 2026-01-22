@@ -29,4 +29,5 @@ urlpatterns = [
     path("v1/tasks/", include("tasks.urls", namespace="tasks")),
     path("v1/common/", include("common.urls", namespace="common")),
     path("v1/hr-config/", include("hr_config.urls", namespace="hr_config")),
+    path("v1/audit/" , include("audit.urls", namespace="audit")),
 ]
