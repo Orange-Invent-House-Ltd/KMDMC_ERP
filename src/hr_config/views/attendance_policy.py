@@ -16,13 +16,6 @@ class AttendancePolicyViewSet(viewsets.ModelViewSet):
     queryset = AttendancePolicy.objects.all()
     serializer_class = AttendancePolicySerializer
     permission_classes = [IsAuthenticated]
-
-    def get_permissions(self):
-        """Only admins can update, all authenticated users can view."""
-        if self.action in ['update', 'partial_update']:
-            return [IsAuthenticated(), IsSuperAdmin()]
-        return [IsAuthenticated()]
-
     
     def list(self, request, *args, **kwargs):
         """Return the singleton attendance policy."""
