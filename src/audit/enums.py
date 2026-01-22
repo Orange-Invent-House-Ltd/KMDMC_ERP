@@ -31,8 +31,10 @@ class AuditModuleEnum(CustomEnum):
     AUTH = "auth", "Authentication"
     USER = "user", "User Management"
     AUDIT = "audit", "Audit Trail"
-    HR_CONFIG = "hr_config", "HR Configuration" 
-    
+    HR_CONFIG = "hr_config", "HR Configuration"
+    TASKS = "tasks", "Tasks Management"
+    CORRESPONDENCE = "correspondence", "Correspondence Management"
+
 
 class AuditTypeEnum(CustomEnum):
     # Auth
@@ -70,7 +72,17 @@ class AuditTypeEnum(CustomEnum):
     DELETE_LEAVE_WORKFLOW = "delete_leave_workflow", "Deleted Leave Approval Workflow"
     ACTIVATE_LEAVE_WORKFLOW = "activate_leave_workflow", "Activated Leave Approval Workflow"
 
-    
+    # TASKS
+    CREATE_TASK = "create_task", "Created Task"
+    UPDATE_TASK = "update_task", "Updated Task"
+    DELETE_TASK = "delete_task", "Deleted Task"
+    ASSIGN_TASK = "assign_task", "Assigned Task"
+
+    # CORRESPONDENCE
+    CREATE_CORRESPONDENCE = "create_correspondence", "Created Correspondence"
+    UPDATE_CORRESPONDENCE = "update_correspondence", "Updated Correspondence"
+    DELETE_CORRESPONDENCE = "delete_correspondence", "Deleted Correspondence"
+
 
 @dataclass
 class LogParams:
