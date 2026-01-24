@@ -49,7 +49,7 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(StaffActivity)
 class StaffActivityAdmin(admin.ModelAdmin):
-    list_display = ['user', 'date', 'activity_count', 'tasks_completed', 'approvals_given', 'activity_level']
+    list_display = ['user', 'date', 'activity_count', 'approvals_pending', 'activity_level']
     list_filter = ['date', 'user__department']
     search_fields = ['user__name', 'user__email']
     date_hierarchy = 'date'
@@ -67,10 +67,10 @@ class StaffActivityAdmin(admin.ModelAdmin):
 
 @admin.register(PerformanceRecord)
 class PerformanceRecordAdmin(admin.ModelAdmin):
-    list_display = ['user', 'month', 'performance_score', 'points_earned', 'completion_rate', 'department_rank']
-    list_filter = ['month', 'user__department']
+    list_display = ['user', 'performance_score', 'points_earned', 'completion_rate']
+    list_filter = ['user__department']
     search_fields = ['user__name', 'user__email']
-    date_hierarchy = 'month'
+    date_hierarchy = 'created_at'
     raw_id_fields = ['user']
 
     def completion_rate(self, obj):

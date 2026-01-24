@@ -14,7 +14,7 @@ class StaffActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = StaffActivity
         fields = [
-            'date', 'activity_count', 'tasks_completed', 'approvals_given',
+            'date', 'activity_count', 'approvals_pending',
             'correspondence_handled', 'memos_processed', 'activity_level'
         ]
 
@@ -28,25 +28,18 @@ class StaffCorrespondenceSerializer(serializers.ModelSerializer):
 
 class PerformanceRecordSerializer(serializers.ModelSerializer):
     """Serializer for performance records."""
-    month_display = serializers.SerializerMethodField()
     completion_rate = serializers.ReadOnlyField()
     on_time_rate = serializers.ReadOnlyField()
 
     class Meta:
         model = PerformanceRecord
         fields = [
-            'id', 'month', 'month_display',
+            'id',
             'tasks_assigned', 'tasks_completed', 'tasks_on_time',
-            'approvals_pending', 'approvals_given', 'avg_approval_time_hours',
-            'correspondence_sent', 'correspondence_received', 'avg_response_time_hours',
+            'correspondence_sent', 'correspondence_received',
             'performance_score', 'points_earned',
-            'department_rank', 'overall_rank',
             'completion_rate', 'on_time_rate'
         ]
-
-    def get_month_display(self, obj):
-        return obj.month.strftime('%B %Y')
-
 
 class StaffListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for staff directory listing."""

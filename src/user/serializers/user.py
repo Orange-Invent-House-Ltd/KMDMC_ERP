@@ -4,6 +4,7 @@ from user.models.models import CustomUser
 from user.models.admin import PermissionModule, Permission
 from utils.utils import ADMIN_SIDEBAR_MODULES
 from user.serializers.permissions import PermissionMinimalSerializer
+from tasks.models import Task
 
 
 
@@ -50,11 +51,15 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 class PerformanceOverviewSerializer(serializers.Serializer):
     """Serializer for performance overview data."""
     name = serializers.CharField(source="user.name", read_only=True)
-    pending_approvals = serializers.IntegerField(help_text="Number of pending approvals")
     department = serializers.CharField(source="user.department.name", read_only=True)
-    active_tasks = serializers.IntegerField(source="active_tasks", help_text="Number of active tasks")
-    # completed_tasks = serializers.IntegerField(help_text="Number of completed tasks")
-    # pending_approvals = serializers.IntegerField(help_text="Number of pending approvals")
+    active_tasks = serializers.SerializerMethodField()
+    avg_response_time_hours = serializers.DecimalField(max_digits=6, decimal_places=2, read_only=True)
+
+    def get_active_tasks(self, obj):
+        return Task.objects.filter(
+            assigned_to=obj.user,
+            status__in=['pending', 'in_progress', 'overdue']
+        ).count()
 
 
 

@@ -163,8 +163,7 @@ class StaffActivity(models.Model):
     )
     date = models.DateField()
     activity_count = models.IntegerField(default=0)
-    tasks_completed = models.IntegerField(default=0)
-    approvals_given = models.IntegerField(default=0)
+    approvals_pending = models.IntegerField(default=0)
     correspondence_handled = models.IntegerField(default=0)
     memos_processed = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -200,36 +199,22 @@ class PerformanceRecord(models.Model):
         on_delete=models.CASCADE,
         related_name='performance_records'
     )
-    month = models.DateField(help_text="First day of the month")
-    
-    # Performance Metrics
-    tasks_assigned = models.IntegerField(default=0)
     tasks_completed = models.IntegerField(default=0)
+    tasks_assigned = models.IntegerField(default=0)
     tasks_on_time = models.IntegerField(default=0)
-    
-    approvals_pending = models.IntegerField(default=0)
-    approvals_given = models.IntegerField(default=0)
-    avg_approval_time_hours = models.DecimalField(max_digits=6, decimal_places=2, default=0)
-    
     correspondence_sent = models.IntegerField(default=0)
     correspondence_received = models.IntegerField(default=0)
     avg_response_time_hours = models.DecimalField(max_digits=6, decimal_places=2, default=0)
-    
+
     # Calculated scores
     performance_score = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     points_earned = models.IntegerField(default=0)
-    
-    # Ranking
-    department_rank = models.IntegerField(null=True, blank=True)
-    overall_rank = models.IntegerField(null=True, blank=True)
-    
-    notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ['user', 'month']
-        ordering = ['-month']
+        # unique_together = ['user', 'month']
+        ordering = ['-created_at']
         verbose_name = 'Performance Record'
         verbose_name_plural = 'Performance Records'
 

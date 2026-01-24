@@ -16,6 +16,7 @@ from utils.permissions import PERMISSIONS
 from utils.activity_log import extract_api_request_metadata
 from audit.tasks import log_audit_event_task
 from audit.enums import AuditModuleEnum, AuditStatusEnum, AuditTypeEnum, LogParams
+from user.models.models import PerformanceRecord
 
 class TaskViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -86,7 +87,10 @@ class TaskViewSet(viewsets.ModelViewSet):
                 status_code=status.HTTP_400_BAD_REQUEST
             )
         serializer.save(assigned_by=request.user)
-        
+        performance = PerformanceRecord.objects.get_or_create(user=serializer.validated_data['assigned_to'])[0]
+        performance.tasks_assigned += 1
+        performance.save()
+
         # Return full task details
         task = Task.objects.select_related('assigned_to', 'assigned_by').get(pk=serializer.instance.pk)
         response_serializer = TaskSerializer(task)
@@ -123,6 +127,10 @@ class TaskViewSet(viewsets.ModelViewSet):
                 status_code=status.HTTP_400_BAD_REQUEST
             )
         serializer.save()
+        if serializer.validated_data.get('status') == 'completed':
+            performance = PerformanceRecord.objects.get_or_create(user=instance.assigned_to)[0]
+            performance.tasks_completed += 1
+            performance.save()
         
         # Return full task details
         instance.refresh_from_db()
