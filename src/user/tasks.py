@@ -1,6 +1,7 @@
 from celery import shared_task
 from core.resources.email_service_v2 import EmailClientV2
 
+from django.contrib.auth import get_user_model
 
 @shared_task
 def send_invitation_email(email, values):
@@ -70,3 +71,14 @@ def send_security_question_notification_email(email, values):
 @shared_task
 def send_transfer_PIN_notification_email(email, values):
     EmailClientV2.send_transfer_PIN_notification_email(email, values)
+
+
+
+from user.service import update_user_avg_task_time
+
+User = get_user_model()
+
+@shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=10, retry_kwargs={'max_retries': 3})
+def recalculate_user_performance(self, user_id):
+    user = User.objects.get(id=user_id)
+    update_user_avg_task_time(user)

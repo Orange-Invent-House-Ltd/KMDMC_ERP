@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from datetime import timedelta
 from utils.pagination import CustomPagination
-from user.models.models import CustomUser, Department, StaffActivity, PerformanceRecord
+from user.models.models import CustomUser, Department, PerformanceRecord
 from user.serializers.staff_profile import (
     StaffListSerializer,
     StaffProfileSerializer,
