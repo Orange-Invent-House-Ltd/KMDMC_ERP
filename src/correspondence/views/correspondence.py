@@ -17,6 +17,7 @@ from correspondence.serializers import (
 )
 from console.permissions import permissions_required
 from utils.permissions import PERMISSIONS
+from utils.activity_log import extract_api_request_metadata
 
 User = get_user_model()
 
@@ -104,6 +105,19 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
                 status_code=status.HTTP_400_BAD_REQUEST
             )
         serializer.save(sender=request.user)
+        user = request.user
+        event = LogParams(
+            audit_type=AuditTypeEnum.CREATE_CORRESPONDENCE.raw_value,
+            audit_module=AuditModuleEnum.CORRESPONDENCE.raw_value,
+            status=AuditStatusEnum.SUCCESS.raw_value,
+            user_id=str(user.id),
+            user_name=user.name.upper(),
+            user_email=user.email,
+            user_role=user.role.name,
+            action=f"{user.name.upper()} created a correspondence",
+            request_meta=extract_api_request_metadata(request),
+        )
+        log_audit_event_task.delay(event.__dict__)
         return Response(
             success=True,
             message="Correspondence created successfully",
@@ -116,6 +130,7 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
         """Override update to return custom response format."""
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
+        old_values = CorrespondenceUpdateSerializer(instance).data
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if not serializer.is_valid():
             return Response(
@@ -124,6 +139,21 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
                 status_code=status.HTTP_400_BAD_REQUEST
             )
         serializer.save()
+        user = request.user
+        event = LogParams(
+            audit_type=AuditTypeEnum.UPDATE_CORRESPONDENCE.raw_value,
+            audit_module=AuditModuleEnum.CORRESPONDENCE.raw_value,
+            status=AuditStatusEnum.SUCCESS.raw_value,
+            user_id=str(user.id),
+            user_name=user.name.upper(),
+            user_email=user.email,
+            user_role=user.role.name,
+            old_values=old_values,
+            new_values=serializer.validated_data,
+            action=f"{user.name.upper()} updated a correspondence",
+            request_meta=extract_api_request_metadata(request),
+        )
+        log_audit_event_task.delay(event.__dict__)
         return Response(
             success=True,
             message="Correspondence updated successfully",

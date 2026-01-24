@@ -3,9 +3,11 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
 from utils.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from audit.enums import AuditModuleEnum, AuditStatusEnum, AuditTypeEnum, LogParams
 from user.serializers.login import LoginSerializer
 from user.serializers.user import UserMinimalSerializer
+from utils.activity_log import extract_api_request_metadata
+from audit.tasks import log_audit_event_task
 
 
 class LoginView(GenericAPIView):
@@ -35,13 +37,24 @@ class LoginView(GenericAPIView):
             refresh.set_exp(lifetime=30 * 24 * 60 * 60)
 
         user_data = UserMinimalSerializer(user).data
+        event = LogParams(
+            audit_type=AuditTypeEnum.USER_LOGIN.raw_value,
+            audit_module=AuditModuleEnum.USER.raw_value,
+            status=AuditStatusEnum.SUCCESS.raw_value,
+            user_id=str(user.id),
+            user_name=user.name.upper(),
+            user_email=user.email,
+            user_role=user.role.name,
+            action=f"{user.name.upper()} logged in",
+            request_meta=extract_api_request_metadata(request),
+        )
+        log_audit_event_task.delay(event.__dict__)
 
         return Response(
             success=True,
             message=f"Welcome back, {user.name}!",
             data={
                 "token": str(refresh.access_token),
-                # "refresh": str(refresh),
                 "user": user_data,
             },
             status_code=status.HTTP_200_OK,

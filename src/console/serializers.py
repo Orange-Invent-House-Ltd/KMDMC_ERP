@@ -15,3 +15,6 @@ class DepartmentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         department = Department.objects.create(**validated_data)
         return department
+    
+class EmptySerializer(serializers.Serializer):
+    pass

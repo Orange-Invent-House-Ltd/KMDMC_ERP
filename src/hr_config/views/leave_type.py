@@ -44,12 +44,6 @@ class LeaveTypeViewSet(viewsets.ModelViewSet):
             return LeaveTypeUpdateSerializer
         return LeaveTypeListSerializer
 
-    def get_permissions(self):
-        """Only admins can create/update/delete, all authenticated users can view."""
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsAuthenticated(), IsSuperAdmin()]
-        return [IsAuthenticated()]
-
     def list(self, request, *args, **kwargs):
         """List all leave types."""
         queryset = self.filter_queryset(self.get_queryset())
