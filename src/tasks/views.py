@@ -135,17 +135,18 @@ class TaskViewSet(viewsets.ModelViewSet):
         # Return full task details
         instance.refresh_from_db()
         response_serializer = TaskSerializer(instance)
+        user = request.user
         event = LogParams(
             audit_type=AuditTypeEnum.UPDATE_TASK.raw_value,
             audit_module=AuditModuleEnum.TASKS.raw_value,
             status=AuditStatusEnum.SUCCESS.raw_value,
             user_id=str(user.id),
-            user_name=request.user.name.upper(),
-            user_email=request.user.email,
-            user_role=request.user.role.name,
+            user_name=user.name.upper(),
+            user_email=user.email,
+            user_role=user.role.name,
             old_values=old_values,
             new_values=serializer.validated_data,
-            action=f"{request.user.name.upper()} updated a task",
+            action=f"{user.name.upper()} updated a task",
             request_meta=extract_api_request_metadata(request),
         )
         log_audit_event_task.delay(event.__dict__)
