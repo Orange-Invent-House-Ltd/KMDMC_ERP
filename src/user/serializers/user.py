@@ -58,7 +58,7 @@ class PerformanceOverviewSerializer(serializers.Serializer):
     def get_active_tasks(self, obj):
         return Task.objects.filter(
             assigned_to=obj.user,
-            status__in=['pending', 'in_progress', 'overdue']
+            status__in=['pending', 'in_progress']
         ).count()
 
 
