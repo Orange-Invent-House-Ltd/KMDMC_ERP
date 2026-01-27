@@ -14,16 +14,6 @@ class PermissionModule(Enum):
     SYSTEM_CONFIG = "SYSTEM_CONFIG"
     DEPARTMENTS = "DEPARTMENTS"
 
-
-    # # SIDEBAR = "SIDEBAR"
-    # # OVERVIEW = "OVERVIEW"
-    # # SETTINGS = "SETTINGS"
-    # CORRESPONDENCE = "CORRESPONDENCE"
-    # # EXECUTIVE = "EXECUTIVE"
-    # TASKS = "TASKS"
-    # HR_SETTINGS = "HR_SETTINGS"
-
-
     @classmethod
     def choices(cls):
         return [(item.value, item.name.replace("_", " ").title()) for item in cls]
