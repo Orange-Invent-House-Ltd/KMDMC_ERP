@@ -54,13 +54,19 @@ class PerformanceOverviewSerializer(serializers.Serializer):
     department = serializers.CharField(source="user.department.name", read_only=True)
     active_tasks = serializers.SerializerMethodField()
     avg_response_time_hours = serializers.DecimalField(max_digits=6, decimal_places=2, read_only=True)
+    over_due_tasks = serializers.SerializerMethodField(read_only=True)
 
     def get_active_tasks(self, obj):
         return Task.objects.filter(
             assigned_to=obj.user,
-            status__in=['pending', 'in_progress', 'overdue']
+            status__in=['pending', 'in_progress']
         ).count()
 
+    def get_over_due_tasks(self, obj):
+        return Task.objects.filter(
+            assigned_to=obj.user,
+            status='overdue'
+        ).count()
 
 
 class LogoutSerializer(serializers.Serializer):
