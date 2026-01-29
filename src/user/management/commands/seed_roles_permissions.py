@@ -87,6 +87,7 @@ ROLE_PERMISSION_MAP = {
         "description": "Operational staff",
         "permissions": [
             PERMISSIONS.CAN_VIEW_CORRESPONDENCE,
+            PERMISSIONS.CAN_CREATE_CORRESPONDENCE,
             PERMISSIONS.CAN_VIEW_TASKS,
             PERMISSIONS.CAN_UPDATE_TASK,
             PERMISSIONS.CAN_EXECUTE_TASKS,
