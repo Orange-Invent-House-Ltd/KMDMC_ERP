@@ -40,7 +40,7 @@ class UploadMediaView(generics.GenericAPIView):
             else:
                 failed.append({
                     "file": image.name,
-                    "error": Response(**result)
+                    "error": result
                 })
 
         return Response(
