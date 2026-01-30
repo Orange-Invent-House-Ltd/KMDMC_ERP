@@ -21,7 +21,7 @@ urlpatterns = [
     path("", views.api_ok, name="api-ok"),
     path("admin/", admin.site.urls),
     path("v1/health-check/", views.HealthCheckView.as_view(), name="health-check"),
-    path("swaggerxyz-docs", schema_view.with_ui("swagger", cache_timeout=0), name="swagger-schema-ui"),
+    path("swaggerxyz-docs/", schema_view.with_ui("swagger", cache_timeout=0), name="swagger-schema-ui"),
     path("swagger.json", schema_view.without_ui(cache_timeout=0), name="schema-json"),    path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="redoc-schema-ui"),
     path("v1/auth/", include("user.urls", namespace="user")),
     path("v1/console/", include("console.urls", namespace="console")),
