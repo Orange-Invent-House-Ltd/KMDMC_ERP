@@ -9,11 +9,12 @@ from django.contrib.auth import get_user_model
 from datetime import timedelta
 from audit.enums import AuditModuleEnum, AuditStatusEnum, AuditTypeEnum, LogParams
 from audit.tasks import log_audit_event_task
-from correspondence.models import Correspondence
+from correspondence.models import Correspondence, CorrespondenceDelegate
 from correspondence.serializers import (
     CorrespondenceListSerializer,
     CorrespondenceCreateSerializer,
-    CorrespondenceUpdateSerializer
+    CorrespondenceUpdateSerializer,
+    CorrespondenceDelegateSerializer,
 )
 from console.permissions import permissions_required
 from utils.permissions import PERMISSIONS
@@ -160,3 +161,40 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
             data=serializer.data,
             status_code=status.HTTP_200_OK
         )
+    
+class CorrespondenceDelegateViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing correspondence delegates.
+    """
+    def get_queryset(self):
+        user = self.request.user
+        return CorrespondenceDelegate.objects.filter(
+            is_active=True
+        ).filter(
+            Q(delegated_by=user) | Q(delegated_to=user)
+        )
+
+    serializer_class = CorrespondenceDelegateSerializer
+    permission_classes = [IsAuthenticated]
+
+    filterset_fields = [ "delegated_to", "correspondence"]
+    ordering = ['-delegated_at']
+
+
+    def create(self, request, *args, **kwargs):
+        """Override create to return custom response format."""
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                success=False,
+                errors=serializer.errors,
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.save(delegated_by=request.user)
+        return Response(
+            success=True,
+            message="Correspondence delegated successfully",
+            data=serializer.data,
+            status_code=status.HTTP_201_CREATED
+        )
+    

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from correspondence.models import Correspondence
+from correspondence.models import Correspondence, CorrespondenceDelegate
 
 
 User = get_user_model()
@@ -153,3 +153,30 @@ class CorrespondenceStatsSerializer(serializers.Serializer):
     by_category = serializers.ListField()
     by_priority = serializers.DictField()
     recent_trend = serializers.ListField()
+
+class CorrespondenceDelegateSerializer(serializers.ModelSerializer):
+    """Serializer for correspondence delegates."""
+    class Meta:
+        model = CorrespondenceDelegate
+        fields = [
+            'id',
+            'correspondence',
+            'delegated_to',
+            'note',
+            'delegated_at',
+        ]
+    
+    def validate(self, attrs):
+        user = self.context['request'].user
+        if attrs.get('delegated_to') == user:
+            raise serializers.ValidationError("You cannot delegate correspondence to yourself.")
+        return attrs
+
+    def create(self, validated_data):
+        CorrespondenceDelegate.objects.filter(
+            correspondence=validated_data['correspondence'],
+            is_active=True
+        ).update(is_active=False)
+        validated_data['is_active'] = True
+        delegate = super().create(validated_data)
+        return delegate
