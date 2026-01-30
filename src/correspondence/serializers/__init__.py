@@ -3,6 +3,7 @@ from .correspondence import (
     CorrespondenceCreateSerializer,
     CorrespondenceUpdateSerializer,
     CorrespondenceStatsSerializer,
+    CorrespondenceDelegateSerializer,
 )
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     'CorrespondenceUpdateSerializer',
     'CorrespondenceStatusSerializer',
     'CorrespondenceStatsSerializer',
+    'CorrespondenceDelegateSerializer',
 ]

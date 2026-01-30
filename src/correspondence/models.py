@@ -97,3 +97,16 @@ class Correspondence(models.Model):
             self.reference_number = f"KDN-{date_str}/{self.daily_serial}"
 
         super().save(*args, **kwargs)
+
+class CorrespondenceDelegate(models.Model):
+    correspondence = models.ForeignKey(Correspondence, on_delete=models.CASCADE, related_name='delegates')
+    delegated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='delegated_correspondences')
+    delegated_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='received_delegated_correspondences')
+    note = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    delegated_at = models.DateTimeField(auto_now_add=True)
+    
+
+    def __str__(self):
+        return f"Delegate for {self.correspondence.subject} - {self.delegated_to.username}"
+    
