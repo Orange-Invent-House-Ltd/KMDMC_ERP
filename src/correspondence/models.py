@@ -57,6 +57,13 @@ class Correspondence(models.Model):
         blank=True,
         related_name='sent_correspondences'
     )
+    delegated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='correspondences_delegate'
+    )
 
     reference_number = models.CharField(max_length=100, unique=True)
     external_sender = models.CharField(max_length=255, blank=True)
