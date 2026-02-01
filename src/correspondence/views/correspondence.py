@@ -190,7 +190,11 @@ class CorrespondenceDelegateViewSet(viewsets.ModelViewSet):
                 errors=serializer.errors,
                 status_code=status.HTTP_400_BAD_REQUEST
             )
-        serializer.save(delegated_by=request.user)
+        delegate = serializer.save()
+        correspondence = delegate.correspondence
+        correspondence.receiver = serializer.validated_data['delegated_to']
+        correspondence.delegated_by = request.user
+        correspondence.save(update_fields=['receiver', 'delegated_by'])
         return Response(
             success=True,
             message="Correspondence delegated successfully",

@@ -178,5 +178,14 @@ class CorrespondenceDelegateSerializer(serializers.ModelSerializer):
             is_active=True
         ).update(is_active=False)
         validated_data['is_active'] = True
-        delegate = super().create(validated_data)
+        delegate, _ = CorrespondenceDelegate.objects.update_or_create(
+            correspondence=validated_data['correspondence'],
+            delegated_to=validated_data['delegated_to'],
+            defaults={
+                'delegated_by': self.context['request'].user,
+                'note': validated_data.get('note', ''),
+                'is_active': True
+            }
+        )
         return delegate
+    
