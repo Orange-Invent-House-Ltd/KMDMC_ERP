@@ -19,6 +19,8 @@ class Correspondence(models.Model):
         ('rejected', 'Rejected'),
         ('archived', 'Archived'),
         ('closed', 'Closed'),
+        ('replied', 'Replied'),
+        ('forwarded', 'Forwarded'),
     ]
 
     CATEGORY_CHOICES = [
