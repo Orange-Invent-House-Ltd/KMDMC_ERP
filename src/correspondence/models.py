@@ -29,6 +29,13 @@ class Correspondence(models.Model):
         ('project', 'Project'),
         ('logistics', 'Logistics')
     ]
+    parent = models.ForeignKey(
+        'self', 
+        on_delete=models.CASCADE, 
+        null=True, 
+        blank=True, 
+        related_name='replies'
+    )
 
     PRIORITY_CHOICES = [
         ('low', 'Low'),
