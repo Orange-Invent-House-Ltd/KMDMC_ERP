@@ -26,13 +26,22 @@ class CorrespondenceUserSerializer(serializers.ModelSerializer):
 # Main Correspondence Serializers
 # ============================================================================
 
+class CorrespondenceThreadSerializer(serializers.ModelSerializer):
+    replies = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Correspondence
+        fields = '__all__'
+
+    def get_replies(self, obj):
+        serializer = CorrespondenceThreadSerializer(obj.replies.all(), many=True)
+        return serializer.data
 
 class CorrespondenceListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for list views (table display)."""
     is_overdue = serializers.SerializerMethodField()
-    sender = serializers.CharField(source='sender.name', read_only=True)
-    receiver = serializers.CharField(source='receiver.name', read_only=True)
-    through = serializers.CharField(source='through.name', read_only=True)
+    parent_id = serializers.ReadOnlyField(source='parent.id')
+    reply_count = serializers.IntegerField(source='replies.count', read_only=True)
 
     class Meta:
         model = Correspondence
@@ -40,6 +49,8 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
             'id',
             'subject', "type",
             'status', 'priority', 'requires_action',
+            'parent_id',
+            'reply_count',
             'due_date',
             'receiver',
             'reference_number',
@@ -59,10 +70,26 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
         if obj.due_date:
             return timezone.now().date() > obj.due_date
         return False
+    
+class CorrespondenceRetrieveSerializer(serializers.ModelSerializer):
+    """Detailed serializer for retrieving a single correspondence."""
 
+    reply_notes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Correspondence
+        fields = ["parent", "reply_notes", "id", "subject", "type",
+            'status', 'priority', 'requires_action',]
+
+    def get_reply_notes(self, obj):
+        return [{"user": reply.sender.username, "note": reply.note} for reply in obj.replies.all()]
 
 class CorrespondenceCreateSerializer(serializers.ModelSerializer):
-    """Serializer for creating new correspondence."""
+    parent = serializers.PrimaryKeyRelatedField(
+        queryset=Correspondence.objects.all(), 
+        required=False, 
+        allow_null=True
+    )
     reference_number = serializers.CharField(read_only=True)
     image_urls = serializers.ListField(
         child=serializers.URLField(),
@@ -74,6 +101,7 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
         model = Correspondence
         fields = [
             'subject',
+            'parent',
             'status', 'priority', 'requires_action',
             'due_date',
             'receiver',
@@ -98,6 +126,12 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context['request'].user
         validated_data['sender'] = user
+        parent = validated_data.get('parent')
+        if parent:
+            if not validated_data['subject'].startswith('Re:'):
+                validated_data['subject'] = f"Re: {parent.subject}"
+            if not validated_data.get('category'):
+                validated_data['category'] = parent.category
         if validated_data.get('status') == 'draft':
             validated_data['status'] = 'draft'
         elif not validated_data.get('requires_action') or validated_data.get('requires_action') is False:
@@ -108,8 +142,18 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
         correspondence = super().create(validated_data)
         return correspondence
 
+class CorrespondenceThreadSerializer(serializers.ModelSerializer):
+    pass
+    # replies = serializers.SerializerMethodField()
 
+    # class Meta:
+    #     model = Correspondence
+    #     fields = '__all__'
 
+    # def get_replies(self, obj):
+    #     serializer = CorrespondenceThreadSerializer(obj.replies.all(), many=True)
+    #     return serializer.data
+    
 class CorrespondenceUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating correspondence."""
     class Meta:
@@ -188,4 +232,3 @@ class CorrespondenceDelegateSerializer(serializers.ModelSerializer):
             }
         )
         return delegate
-    
