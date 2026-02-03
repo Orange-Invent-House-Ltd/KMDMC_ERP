@@ -12,6 +12,7 @@ from audit.tasks import log_audit_event_task
 from correspondence.models import Correspondence, CorrespondenceDelegate
 from correspondence.serializers import (
     CorrespondenceListSerializer,
+    CorrespondenceRetrieveSerializer,
     CorrespondenceCreateSerializer,
     CorrespondenceUpdateSerializer,
     CorrespondenceDelegateSerializer,
@@ -46,8 +47,10 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
     ordering = ['-created_at']
 
     def get_serializer_class(self):
-        if self.action == ['list', 'retrieve']:
+        if self.action == 'list':
             return CorrespondenceListSerializer
+        elif self.action == 'retrieve':
+            return CorrespondenceRetrieveSerializer
         elif self.action == 'create':
             return CorrespondenceCreateSerializer
         elif self.action in ['update', 'partial_update']:
