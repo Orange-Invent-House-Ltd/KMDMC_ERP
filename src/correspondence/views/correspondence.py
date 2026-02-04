@@ -132,7 +132,7 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
             user_name=user.name.upper(),
             user_email=user.email,
             user_role=user.role.name,
-            correspondence=corr_parent,
+            correspondence_id=corr_parent.id,
             action=f"{user.name.upper()} created a correspondence",
             request_meta=extract_api_request_metadata(request),
         )
