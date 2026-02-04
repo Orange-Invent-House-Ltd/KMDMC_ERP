@@ -185,6 +185,8 @@ class CorrespondenceDelegateViewSet(viewsets.ModelViewSet):
     ViewSet for managing correspondence delegates.
     """
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return CorrespondenceDelegate.objects.none()
         user = self.request.user
         return CorrespondenceDelegate.objects.filter(
             is_active=True
