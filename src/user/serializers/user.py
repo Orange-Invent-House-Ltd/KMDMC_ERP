@@ -44,7 +44,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = [
-            "is_verified",
+            "is_active",
         ]
         read_only_fields = ["id"]
 

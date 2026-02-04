@@ -15,5 +15,5 @@ __all__ = [
     'CorrespondenceStatusSerializer',
     'CorrespondenceStatsSerializer',
     'CorrespondenceDelegateSerializer',
-    'CorrespondenceThreadSerializer',
+    'CorrespondenceRetrieveSerializer',
 ]

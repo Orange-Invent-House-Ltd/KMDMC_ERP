@@ -3,12 +3,16 @@ import uuid
 from django.db import models
 
 from .enums import AuditModuleEnum, AuditStatusEnum, AuditTypeEnum, LogParams
+from correspondence.models import Correspondence
 
 
 class AuditLog(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     audit_module = models.CharField(
         max_length=50, choices=AuditModuleEnum.choices(), db_index=True
+    )
+    correspondence = models.ForeignKey(
+        Correspondence, null=True, blank=True, on_delete=models.CASCADE, related_name="audit_logs"
     )
     audit_type = models.CharField(
         max_length=100, choices=AuditTypeEnum.choices(), db_index=True
@@ -54,6 +58,7 @@ class AuditLog(models.Model):
             user_role=params.user_role,
             user_email=params.user_email,
             action=params.action,
+            correspondence=params.correspondence,
             request_meta=params.request_meta,
             old_values=params.old_values,
             new_values=params.new_values,
