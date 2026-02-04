@@ -124,5 +124,5 @@ class CorrespondenceDelegate(models.Model):
     
 
     def __str__(self):
-        return f"Delegate for {self.correspondence.subject} - {self.delegated_to.username}"
+        return f"Delegate for {self.correspondence.subject} - {self.delegated_to.name}"
     

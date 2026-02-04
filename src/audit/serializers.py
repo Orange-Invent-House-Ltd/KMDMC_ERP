@@ -7,7 +7,7 @@ class AuditLogSerializer(serializers.ModelSerializer):
     ip_address = serializers.SerializerMethodField()
     class Meta:
         model = AuditLog
-        fields = ["user_name", "parent", "user_role", "action", "audit_type", "audit_module",
+        fields = ["user_name", "correspondence", "user_role", "action", "audit_type", "audit_module",
                   "ip_address", "created_at", ]
         
     def get_ip_address(self, obj):

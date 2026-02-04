@@ -4,10 +4,9 @@ from .user import UserMinimalSerializer
 
 
 class LoginSerializer(serializers.Serializer):
-    """Serializer for user login. Accepts username or email."""
 
     login = serializers.CharField(
-        help_text="Username or email address"
+        help_text="email address"
     )
     password = serializers.CharField(
         write_only=True,
@@ -30,17 +29,15 @@ class LoginSerializer(serializers.Serializer):
         password = attrs.get("password")
 
         if login and password:
-            # authenticate() will use our custom backend
-            # which checks both username and email
             user = authenticate(
                 request=self.context.get("request"),
-                username=login,  # Our backend handles both username and email
+                email=login,
                 password=password
             )
 
             if not user:
                 raise serializers.ValidationError(
-                    "Invalid username/email or password.",
+                    "Invalid email or password.",
                     code="authentication"
                 )
 
