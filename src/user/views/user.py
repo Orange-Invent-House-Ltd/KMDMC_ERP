@@ -58,10 +58,10 @@ class MDVerifyUserView(UpdateAPIView):
         instance = self.get_object()
 
         # Check if already verified
-        if instance.is_verified:
+        if instance.is_active:
             return Response(
                 success=False,
-                message="User is already verified.",
+                message="User is already approved.",
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
 

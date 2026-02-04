@@ -51,7 +51,6 @@ class AuditTypeEnum(CustomEnum):
     MANUAL_DEBIT_USER = "manual_debit_user", "Manually Debited User"
     MANUAL_CREDIT_USER = "manual_credit_user", "Manually Credited User"
     CONVERT_USER_TYPE = "convert_user_type", "Converted User Type"
-    VIEW_CORRESPONDENCE = "view_correspondence", "Viewed Correspondence"
     CHANGE_CORRESPONDENCE_STATUS = "change_correspondence_status", "Changed Correspondence Status"
     ARCHIVE_CORRESPONDENCE = "archive_correspondence", "Archived Correspondence"
 
@@ -82,6 +81,7 @@ class AuditTypeEnum(CustomEnum):
     CREATE_CORRESPONDENCE = "create_correspondence", "Created Correspondence"
     UPDATE_CORRESPONDENCE = "update_correspondence", "Updated Correspondence"
     DELETE_CORRESPONDENCE = "delete_correspondence", "Deleted Correspondence"
+    VIEW_CORRESPONDENCE = "view_correspondence", "Viewed Correspondence"
 
 
 @dataclass
@@ -95,6 +95,7 @@ class LogParams:
     user_email: str
     action: str
     request_meta: dict
+    correspondence: Optional[str] = None
     old_values: Optional[Dict[str, Any]] = None
     new_values: Optional[Dict[str, Any]] = None
     request_id: Optional[str] = None

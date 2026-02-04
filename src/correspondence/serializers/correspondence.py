@@ -26,22 +26,17 @@ class CorrespondenceUserSerializer(serializers.ModelSerializer):
 # Main Correspondence Serializers
 # ============================================================================
 
-class CorrespondenceThreadSerializer(serializers.ModelSerializer):
-    replies = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Correspondence
-        fields = '__all__'
-
-    def get_replies(self, obj):
-        serializer = CorrespondenceThreadSerializer(obj.replies.all(), many=True)
-        return serializer.data
-
 class CorrespondenceListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for list views (table display)."""
     is_overdue = serializers.SerializerMethodField()
     parent_id = serializers.ReadOnlyField(source='parent.id')
     reply_count = serializers.IntegerField(source='replies.count', read_only=True)
+    receiver = serializers.CharField(source='receiver.username', read_only=True)
+    receiver_mail = serializers.CharField(source='receiver.email', read_only=True)
+    through = serializers.CharField(source='through.name', read_only=True)
+    through_mail = serializers.CharField(source='through.email', read_only=True)
+    sender = serializers.CharField(source='sender.username', read_only=True)
+    sender_mail = serializers.CharField(source='sender.email', read_only=True)
 
     class Meta:
         model = Correspondence
@@ -53,8 +48,10 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
             'reply_count',
             'due_date',
             'receiver',
+            'receiver_mail',
             'reference_number',
             'through',
+            "through_mail",
             'category',
             'is_confidential',
             'note',
@@ -63,6 +60,7 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
             'created_at',
             'archived_at',
             "sender",
+            "sender_mail",
             "image_urls"
         ]
 
@@ -73,16 +71,20 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
     
 class CorrespondenceRetrieveSerializer(serializers.ModelSerializer):
     """Detailed serializer for retrieving a single correspondence."""
-
     reply_notes = serializers.SerializerMethodField()
 
     class Meta:
         model = Correspondence
-        fields = ["parent", "reply_notes", "id", "subject", "type",
-            'status', 'priority', 'requires_action',]
+        fields = [ "id", "subject", "type", "note",
+            'status', 'priority',
+            'requires_action', "reply_notes",]
 
     def get_reply_notes(self, obj):
-        return [{"user": reply.sender.username, "note": reply.note} for reply in obj.replies.all()]
+        return [{"sender": reply.sender.name, 
+                 "receiver": reply.receiver.name,
+                 "sender_email": reply.sender.email,
+                 "receiver_email": reply.receiver.email,
+                 "note": reply.note} for reply in obj.replies.all()]
 
 class CorrespondenceCreateSerializer(serializers.ModelSerializer):
     parent = serializers.PrimaryKeyRelatedField(
@@ -90,6 +92,8 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
         required=False, 
         allow_null=True
     )
+    receiver_mail = serializers.EmailField(write_only=True, required=False)
+    sender_mail = serializers.EmailField(write_only=True, required=False)
     reference_number = serializers.CharField(read_only=True)
     image_urls = serializers.ListField(
         child=serializers.URLField(),
@@ -100,11 +104,14 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Correspondence
         fields = [
+            "id",
             'subject',
             'parent',
             'status', 'priority', 'requires_action',
             'due_date',
             'receiver',
+            'receiver_mail',
+            'sender_mail',
             'reference_number',
             'through',
             'category',
@@ -142,18 +149,6 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
         correspondence = super().create(validated_data)
         return correspondence
 
-class CorrespondenceThreadSerializer(serializers.ModelSerializer):
-    pass
-    # replies = serializers.SerializerMethodField()
-
-    # class Meta:
-    #     model = Correspondence
-    #     fields = '__all__'
-
-    # def get_replies(self, obj):
-    #     serializer = CorrespondenceThreadSerializer(obj.replies.all(), many=True)
-    #     return serializer.data
-    
 class CorrespondenceUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating correspondence."""
     class Meta:

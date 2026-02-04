@@ -90,6 +90,19 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
         """Override retrieve to return custom response format."""
         instance = self.get_object()
         serializer = self.get_serializer(instance)
+        user = request.user
+        event = LogParams(
+            audit_type=AuditTypeEnum.VIEW_CORRESPONDENCE.raw_value,
+            audit_module=AuditModuleEnum.CORRESPONDENCE.raw_value,
+            status=AuditStatusEnum.SUCCESS.raw_value,
+            user_id=str(user.id),
+            user_name=user.name.upper(),
+            user_email=user.email,
+            user_role=user.role.name,
+            action=f"{user.name.upper()} viewed a correspondence",
+            request_meta=extract_api_request_metadata(request),
+        )
+        log_audit_event_task.delay(event.__dict__)
         return Response(
             success=True,
             message="Correspondence retrieved successfully",
@@ -110,6 +123,7 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
             )
         serializer.save(sender=request.user)
         user = request.user
+        corr_parent = serializer.validated_data.get('parent')
         event = LogParams(
             audit_type=AuditTypeEnum.CREATE_CORRESPONDENCE.raw_value,
             audit_module=AuditModuleEnum.CORRESPONDENCE.raw_value,
@@ -118,6 +132,7 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
             user_name=user.name.upper(),
             user_email=user.email,
             user_role=user.role.name,
+            correspondence=corr_parent,
             action=f"{user.name.upper()} created a correspondence",
             request_meta=extract_api_request_metadata(request),
         )
