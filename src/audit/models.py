@@ -58,7 +58,7 @@ class AuditLog(models.Model):
             user_role=params.user_role,
             user_email=params.user_email,
             action=params.action,
-            correspondence=params.correspondence,
+            correspondence_id=params.correspondence_id,
             request_meta=params.request_meta,
             old_values=params.old_values,
             new_values=params.new_values,

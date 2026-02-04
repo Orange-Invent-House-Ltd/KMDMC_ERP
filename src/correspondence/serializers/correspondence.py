@@ -71,20 +71,35 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
     
 class CorrespondenceRetrieveSerializer(serializers.ModelSerializer):
     """Detailed serializer for retrieving a single correspondence."""
+    sender_name = serializers.CharField(source='sender.name', read_only=True)
+    sender_email = serializers.CharField(source='sender.email', read_only=True)
+    receiver_name = serializers.CharField(source='receiver.name', read_only=True)
+    receiver_email = serializers.CharField(source='receiver.email', read_only=True)
+    through_name = serializers.CharField(source='through.name', read_only=True)
+    through_email = serializers.CharField(source='through.email', read_only=True)
     reply_notes = serializers.SerializerMethodField()
+    forwarded_notes = serializers.SerializerMethodField()
 
     class Meta:
         model = Correspondence
-        fields = [ "id", "subject", "type", "note",
+        fields = [ "id", "subject", "type", "note", "sender_name", "sender_email",
+                  "receiver_name", "receiver_email", "through_name", "through_email",
             'status', 'priority',
-            'requires_action', "reply_notes",]
+            'requires_action', "reply_notes", "forwarded_notes"]
 
     def get_reply_notes(self, obj):
         return [{"sender": reply.sender.name, 
                  "receiver": reply.receiver.name,
                  "sender_email": reply.sender.email,
                  "receiver_email": reply.receiver.email,
-                 "note": reply.note} for reply in obj.replies.all()]
+                 "note": reply.note} for reply in obj.replies.filter(status='replied').all()]
+
+    def get_forwarded_notes(self, obj):
+        return [{"sender": forward.sender.name,
+                 "receiver": forward.receiver.name,
+                 "sender_email": forward.sender.email,
+                 "receiver_email": forward.receiver.email,
+                 "note": forward.note} for forward in obj.replies.filter(status='forwarded').all()]
 
 class CorrespondenceCreateSerializer(serializers.ModelSerializer):
     parent = serializers.PrimaryKeyRelatedField(
@@ -133,17 +148,25 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context['request'].user
         validated_data['sender'] = user
+        status = validated_data.get('status')
         parent = validated_data.get('parent')
         if parent:
-            if not validated_data['subject'].startswith('Re:'):
-                validated_data['subject'] = f"Re: {parent.subject}"
-            if not validated_data.get('category'):
-                validated_data['category'] = parent.category
+            validated_data['requires_action'] = False
+            if validated_data['status'] == 'forwarded':
+                if not validated_data['subject'].startswith('Fwd:'):
+                    validated_data['subject'] = f"Fwd: {parent.subject}"
+                if not validated_data.get('category'):
+                    validated_data['category'] = parent.category
+            elif validated_data['status'] == 'replied':
+                if not validated_data['subject'].startswith('Re:'):
+                    validated_data['subject'] = f"Re: {parent.subject}"
+                if not validated_data.get('category'):
+                    validated_data['category'] = parent.category
         if validated_data.get('status') == 'draft':
             validated_data['status'] = 'draft'
         elif not validated_data.get('requires_action') or validated_data.get('requires_action') is False:
             validated_data["due_date"] = None
-            validated_data['status'] = "new"
+            validated_data['status'] = status
         else:
             validated_data['status'] = 'pending_action'
         correspondence = super().create(validated_data)
