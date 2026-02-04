@@ -95,7 +95,7 @@ class LogParams:
     user_email: str
     action: str
     request_meta: dict
-    correspondence: Optional[str] = None
+    correspondence_id: Optional[str] = None
     old_values: Optional[Dict[str, Any]] = None
     new_values: Optional[Dict[str, Any]] = None
     request_id: Optional[str] = None
