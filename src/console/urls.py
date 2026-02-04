@@ -21,6 +21,6 @@ router.register(r"roles", RoleViewSet, basename="roles")
 urlpatterns = [
     # Include router URLs
     path("", include(router.urls)),
-    path("MDVerify/<int:user_id>/", MDVerifyUserView.as_view(), name="MD_verify_user"),
+    path("MDVerify/<int:user_id>/", MDVerifyUserView.as_view(), name="MD_approve_user"),
     path("user-dropdown/", UserDropdownListView.as_view(), name="user_dropdown"),
 ]

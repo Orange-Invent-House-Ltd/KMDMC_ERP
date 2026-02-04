@@ -145,6 +145,14 @@ class CustomUser(AbstractUser):
             self.employee_id = f"{prefix}-{random.randint(1000, 9999)}"
         return self.employee_id
     
+    def generate_email(self):
+        """Generate email based on name."""
+        if self.name:
+            base_email = self.name.lower().replace(" ", "_")
+            domain = "kmdmc.com"
+            self.email = f"{base_email}@{domain}"
+        return self.email
+    
     def has_permissions(self, permission_names):
         """Check if user has all specified permissions."""
         if not self.role:

@@ -41,7 +41,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             "is_verified",
             "created_at",
         ]
-        read_only_fields = ["id", "is_verified", "created_at"]
+        read_only_fields = ["id", "email", "is_verified", "created_at"]
 
     def validate_username(self, value):
         username = value.lower().strip()
@@ -88,6 +88,8 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop("password")
         user = CustomUser(**validated_data)
+        validated_data["email"] = user.generate_email()
+        user.is_active = False
         user.set_password(password)
         user.save()
         user.employee_id = f"KMD-{user.id}"
