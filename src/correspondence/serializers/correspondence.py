@@ -31,11 +31,11 @@ class CorrespondenceListSerializer(serializers.ModelSerializer):
     is_overdue = serializers.SerializerMethodField()
     parent_id = serializers.ReadOnlyField(source='parent.id')
     reply_count = serializers.IntegerField(source='replies.count', read_only=True)
-    receiver = serializers.CharField(source='receiver.username', read_only=True)
+    receiver = serializers.CharField(source='receiver.name', read_only=True)
     receiver_mail = serializers.CharField(source='receiver.email', read_only=True)
     through = serializers.CharField(source='through.name', read_only=True)
     through_mail = serializers.CharField(source='through.email', read_only=True)
-    sender = serializers.CharField(source='sender.username', read_only=True)
+    sender = serializers.CharField(source='sender.name', read_only=True)
     sender_mail = serializers.CharField(source='sender.email', read_only=True)
 
     class Meta:

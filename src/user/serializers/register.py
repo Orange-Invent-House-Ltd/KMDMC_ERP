@@ -30,7 +30,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = [
             "id",
-            "username",
             "name",
             "email",
             "phone",
@@ -42,14 +41,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             "created_at",
         ]
         read_only_fields = ["id", "email", "is_verified", "created_at"]
-
-    def validate_username(self, value):
-        username = value.lower().strip()
-        if CustomUser.objects.filter(username__iexact=username).exists():
-            raise serializers.ValidationError(
-                "A user with this username already exists."
-            )
-        return username
 
     def validate_email(self, value):
         email = value.lower().strip()

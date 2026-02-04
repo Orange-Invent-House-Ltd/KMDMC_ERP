@@ -54,7 +54,6 @@ class Command(BaseCommand):
         sarah, created = User.objects.get_or_create(
             email='sarah.jenkins@kmdmc.go.tz',
             defaults={
-                'username': 'sarah.jenkins',
                 'name': 'Sarah Jenkins',
                 'department': departments.get('Logistics'),
                 'location': 'headquarters',

@@ -157,7 +157,7 @@ AUTH_USER_MODEL = "user.CustomUser"
 
 # Authentication backends - allows login with username or email
 AUTHENTICATION_BACKENDS = [
-    "user.backends.EmailOrUsernameBackend",
+    "user.backends.EmailBackend",
     "django.contrib.auth.backends.ModelBackend",  # Fallback
 ]
 

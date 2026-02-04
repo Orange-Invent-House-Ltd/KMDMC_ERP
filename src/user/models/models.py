@@ -70,8 +70,8 @@ class CustomUser(AbstractUser):
         ('regional_office', 'Regional Office'),
         ('remote', 'Remote'),
     ]
+    username = None  # Remove username field
 
-    username = models.CharField(max_length=150, unique=True)
     name = models.CharField(max_length=255)
     role = models.ForeignKey(
         Role,
