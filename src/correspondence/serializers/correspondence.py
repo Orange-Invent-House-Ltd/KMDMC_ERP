@@ -82,7 +82,7 @@ class CorrespondenceRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Correspondence
-        fields = [ "id", "subject", "type", "note", "sender_name", "sender_email",
+        fields = [ "id", "subject", "parent", "type", "note", "reference_number", "external_sender", "sender_name", "sender_email",
                   "receiver_name", "receiver_email", "through_name", "through_email",
             'status', 'priority',
             'requires_action', "reply_notes", "forwarded_notes"]
