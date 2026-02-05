@@ -42,6 +42,13 @@ class RegisterSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "email", "is_verified", "created_at"]
 
+    def validate_role(self, value):
+        if value.create_once and Role.objects.filter(name=value.name).exists():
+            raise serializers.ValidationError(
+                "This role is unavailable as it is marked as create_once."
+            )
+        return value
+
     def validate_email(self, value):
         email = value.lower().strip()
         if CustomUser.objects.filter(email__iexact=email).exists():
