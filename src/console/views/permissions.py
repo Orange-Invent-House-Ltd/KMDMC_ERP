@@ -65,7 +65,7 @@ class PermissionViewSet(viewsets.ModelViewSet):
         },
     )
 
-    @permissions_required([PERMISSIONS.CAN_ADD_PERMISSIONS_TO_ROLE])
+    @permissions_required([PERMISSIONS.CAN_ADD_ROLES])
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
@@ -249,7 +249,7 @@ class RoleViewSet(viewsets.ModelViewSet):
         ),
         responses={200: RoleSerializer},
     )
-    @permissions_required([PERMISSIONS.CAN_ADD_PERMISSIONS_TO_ROLE])
+    @permissions_required([PERMISSIONS.CAN_ADD_ROLES])
     @action(detail=True, methods=["post"], url_path="add-permissions")
     def add_permissions(self, request, pk=None):
         role = self.get_object()
@@ -292,7 +292,7 @@ class RoleViewSet(viewsets.ModelViewSet):
         ),
         responses={200: RoleSerializer},
     )
-    @permissions_required([PERMISSIONS.CAN_ADD_PERMISSIONS_TO_ROLE])
+    @permissions_required([PERMISSIONS.CAN_ADD_ROLES])
     @action(detail=True, methods=["post"], url_path="remove-permissions")
     def remove_permissions(self, request, pk=None):
         role = self.get_object()
