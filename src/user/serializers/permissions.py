@@ -27,6 +27,7 @@ class RoleSerializer(serializers.ModelSerializer):
     permission_details = PermissionMinimalSerializer(
         source="permissions", many=True, read_only=True
     )
+    create_once = serializers.BooleanField(write_only=True, required=False, default=False)
     parent_name = serializers.CharField(source="parent.name", read_only=True)
     allowed_modules = serializers.SerializerMethodField()
     sidebar_modules = serializers.SerializerMethodField()
@@ -37,6 +38,7 @@ class RoleSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "code",
+            "create_once",
             "description",
             "allowed_modules",
             "sidebar_modules",
@@ -55,6 +57,18 @@ class RoleSerializer(serializers.ModelSerializer):
             "permission_details",
             "parent_name",
         ]
+
+    def validate(self, attrs):
+            if self.instance and self.instance.create_once:
+                if "name" in attrs and attrs["name"] != self.instance.name:
+                    raise serializers.ValidationError(
+                        {"name": "This role cannot be renamed."}
+                    )
+                if "code" in attrs and attrs["code"] != self.instance.code:
+                    raise serializers.ValidationError(
+                        {"code": "This role cannot be recoded."}
+                    )
+                return super().validate(attrs)
 
     def get_allowed_modules(self, obj):
         modules = set()
