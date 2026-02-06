@@ -68,7 +68,7 @@ class RoleSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError(
                         {"code": "This role cannot be recoded."}
                     )
-                return super().validate(attrs)
+            return super().validate(attrs)
 
     def get_allowed_modules(self, obj):
         modules = set()
