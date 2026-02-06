@@ -11,6 +11,7 @@ from tasks.serializers import (
     TaskStatusUpdateSerializer,
     TaskAdminUpdateSerializer,
 )
+from utils.pagination import CustomPagination
 from console.permissions import permissions_required
 from utils.permissions import PERMISSIONS
 from utils.activity_log import extract_api_request_metadata
@@ -25,6 +26,7 @@ class TaskViewSet(viewsets.ModelViewSet):
     search_fields = ['title', 'description']
     ordering_fields = ['created_at', 'deadline', 'priority', 'status']
     ordering = ['-created_at']
+    pagination_class = CustomPagination
 
     def get_serializer_class(self):
         if self.action == 'create':
