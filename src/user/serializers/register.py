@@ -4,6 +4,8 @@ from rest_framework import serializers
 
 from user.models.models import CustomUser, Department
 from user.models.admin import Role
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -43,7 +45,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "email", "is_verified", "created_at"]
 
     def validate_role(self, value):
-        if value.create_once and Role.objects.filter(name=value.name).exists():
+        if value.create_once and User.objects.filter(role=value).exists():
             raise serializers.ValidationError(
                 "This role is unavailable as it is marked as create_once."
             )
