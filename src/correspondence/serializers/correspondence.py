@@ -75,7 +75,7 @@ class CorrespondenceRetrieveSerializer(serializers.ModelSerializer):
     sender_email = serializers.CharField(source='sender.email', read_only=True)
     receiver_name = serializers.CharField(source='receiver.name', read_only=True)
     receiver_email = serializers.CharField(source='receiver.email', read_only=True)
-    through_name = serializers.CharField(source='through.name', read_only=True)
+    through = serializers.CharField(source='through.name', read_only=True)
     through_email = serializers.CharField(source='through.email', read_only=True)
     reply_notes = serializers.SerializerMethodField()
     forwarded_notes = serializers.SerializerMethodField()
@@ -83,7 +83,7 @@ class CorrespondenceRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Correspondence
         fields = [ "id", "subject", "parent", "type", "note", "reference_number", "external_sender", "sender_name", "sender_email",
-                  "receiver_name", "receiver_email", "through_name", "through_email",
+                   "receiver_name", "receiver_email", "through", "through_email",
             'status', 'priority',
             'requires_action', "reply_notes", "forwarded_notes"]
 
@@ -107,14 +107,17 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
         required=False, 
         allow_null=True
     )
-    receiver_mail = serializers.EmailField(write_only=True, required=False)
-    sender_mail = serializers.EmailField(write_only=True, required=False)
+    receiver_name = serializers.CharField(source='receiver.name', read_only=True)
+    receiver_mail = serializers.CharField(source='receiver.email', read_only=True)
+    sender_name = serializers.CharField(source='sender.name', read_only=True)
+    sender_mail = serializers.CharField(source='sender.email', read_only=True)
     reference_number = serializers.CharField(read_only=True)
     image_urls = serializers.ListField(
         child=serializers.URLField(),
         required=False
     )
-    through = serializers.CharField(source='through.name', read_only=True)
+    through_name = serializers.CharField(source='through.name', read_only=True)
+    through_mail = serializers.CharField(source='through.email', read_only=True)
 
     class Meta:
         model = Correspondence
@@ -124,11 +127,15 @@ class CorrespondenceCreateSerializer(serializers.ModelSerializer):
             'parent',
             'status', 'priority', 'requires_action',
             'due_date',
-            'receiver',
+            "receiver",
+            'receiver_name',
             'receiver_mail',
+            'sender_name',
             'sender_mail',
             'reference_number',
             'through',
+            'through_name',
+            'through_mail',
             'category',
             'is_confidential',
             'note',

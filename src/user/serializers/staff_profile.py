@@ -123,7 +123,7 @@ class UserDropdownSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "label"]
+        fields = ["id", "label", "email"]
 
     def get_label(self, obj):
         return f"{obj.name}"

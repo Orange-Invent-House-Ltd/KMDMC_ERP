@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from utils.pagination import CustomPagination
 from datetime import timedelta
 from audit.enums import AuditModuleEnum, AuditStatusEnum, AuditTypeEnum, LogParams
 from audit.tasks import log_audit_event_task
@@ -30,6 +31,7 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
     """
     queryset = Correspondence.objects.all()
     permission_classes = [IsAuthenticated]
+    pagination_class = CustomPagination
 
     filterset_fields = [
         'correspondence_type', 'status', 'priority',
@@ -132,7 +134,7 @@ class CorrespondenceViewSet(viewsets.ModelViewSet):
             user_name=user.name.upper(),
             user_email=user.email,
             user_role=user.role.name,
-            correspondence_id=corr_parent.id,
+            correspondence_id=corr_parent.id if corr_parent else None,
             action=f"{user.name.upper()} created a correspondence",
             request_meta=extract_api_request_metadata(request),
         )
